@@ -1,0 +1,22 @@
+# demonstration of a basic FOR loop in Numberrain
+# adds the first 5 integers (1 + 2 + 3 + 4 + 5)
+# the final answer of this script is 15
+
+!PRECISION 100
+
+BEGIN;
+
+# just assign 0 to variable 'sum'
+NOP 0;
+ASSIGN sum;
+
+FOR i 1 6 1;
+
+ADD sum i;
+ASSIGN sum;
+
+ENDFOR;
+
+PRINT "final sum is" sum;
+
+END;

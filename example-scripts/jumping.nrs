@@ -1,0 +1,17 @@
+# basic demonstration of jumping in Numberrain scripting
+
+!PRECISION 20
+
+BEGIN;
+
+CMP 1 1;
+JEQ label1; # jump to label1 if 1 = 1
+
+# JEQ operation jumps to label1 - thus this gets skipped over and never executed
+PRINT "i never get printed";
+
+MARK label1;
+
+PRINT "i always get printed";
+
+END;

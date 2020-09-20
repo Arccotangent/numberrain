@@ -1,0 +1,28 @@
+# basic demonstration of arguments
+
+!PRECISION 20
+
+BEGIN;
+
+CMP argcount 0;
+JEQ noArgs;
+
+PRINT "you entered" argcount "arguments on the command line";
+PRINT "printing them now";
+PRINT "";
+
+FOR i 0 argcount 1;
+
+PRINT "argument" i "is" arg_i; # argument indices can be variables
+
+ENDFOR;
+
+JMP end;
+
+MARK noArgs;
+
+PRINT "you entered no arguments";
+
+MARK end;
+
+END;

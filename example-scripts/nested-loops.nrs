@@ -1,0 +1,29 @@
+# demonstration of nested FOR loops in Numberrain
+# this script will sum 5-10 with 1 and 2 in between each one (5 + 1 + 2 + 6 + 1 + 2 + 7 + 1 + 2 + ... + 10 + 1 + 2)
+# the final answer of this script is 63
+
+!PRECISION 100
+
+BEGIN;
+
+# just assign 0 to variable 'sum'
+NOP 0;
+ASSIGN sum;
+
+FOR i 5 11 1;
+
+ADD sum i;
+ASSIGN sum;
+
+FOR j 1 3 1;
+
+ADD sum j;
+ASSIGN sum;
+
+ENDFOR;
+
+ENDFOR;
+
+PRINT "final sum is" sum;
+
+END;

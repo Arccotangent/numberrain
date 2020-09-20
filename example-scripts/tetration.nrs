@@ -1,0 +1,32 @@
+# using looping to achieve tetration
+# a is the base
+# warning - tetration function's output grows very quickly, 2 tetrated to 3 is 65,536 and 2 tetrated to 4 has over 19,000 decimal digits
+
+!PRECISION 100
+
+BEGIN;
+
+# customize these two variables to change the result
+
+NOP 2;
+ASSIGN a;
+
+NOP 3;
+ASSIGN b;
+
+# begin tetration code
+
+NOP a;
+ASSIGN res;
+
+FOR i b 0 -1;
+
+EXP a res;
+ASSIGN res;
+
+ENDFOR;
+
+PRINT "evaluated" a "tetrated to" b;
+PRINT "final result is" res;
+
+END;

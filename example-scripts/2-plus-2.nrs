@@ -1,0 +1,13 @@
+# basics of Numberrain scripting
+# adds 2 + 2
+
+!PRECISION 100
+
+BEGIN;
+
+ADD 2 2; # add 2 + 2
+ASSIGN sum; # store result in variable called sum
+
+PRINT sum; # print value stored in sum
+
+END;

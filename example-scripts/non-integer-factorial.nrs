@@ -1,0 +1,50 @@
+# evaluate factorials for non-integers using euler's infinite product
+# requires large amount of terms due to very slow convergence
+
+!PRECISION 100
+
+BEGIN;
+
+# customize
+
+NOP 10;
+ASSIGN arg;
+
+NOP 250000;
+ASSIGN terms;
+
+# begin calculation
+
+NOP 1;
+ASSIGN res;
+
+FOR k 1 terms 1;
+
+DIV 1 k;
+ASSIGN recipK;
+
+DIV arg k;
+ASSIGN arg/k; # valid variable name
+
+ADD 1 recipK;
+ASSIGN numerBase;
+
+EXP numerBase arg;
+ASSIGN numer;
+
+ADD 1 arg/k;
+ASSIGN denom;
+
+DIV numer denom;
+ASSIGN term;
+
+MUL res term;
+ASSIGN res;
+
+ENDFOR;
+
+PRINT "";
+PRINT "factorial of" arg "is approximately" res;
+PRINT "";
+
+END;

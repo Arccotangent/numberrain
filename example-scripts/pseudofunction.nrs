@@ -1,0 +1,34 @@
+# demonstration of "pseudo-functions" in Numberrain scripting
+# this is the only way of implementing "functions" before they are built into Numberrain
+
+!PRECISION 20
+
+BEGIN;
+
+JMP begin; # skip over the below pseudo-function
+
+# simple pseudo-function that accepts 1 argument, doubles it, and returns the result
+
+MARK func1;
+
+PRINT "func1 has been 'called'";
+
+MUL func1arg1 2;
+ASSIGN return;
+
+JMP func1return; # "return" from the pseudo-function
+
+# end func1
+
+MARK begin;
+
+NOP 4;
+ASSIGN func1arg1;
+
+JMP func1; # "call" the pseudo-function
+
+MARK func1return;
+
+PRINT "func1 returned" return;
+
+END;
