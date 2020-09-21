@@ -277,6 +277,10 @@ void ScriptEngine::executeRealOperation(ScriptOperation operation, const vector<
 			result = fmt(op->getResult());
 			break;
 		}
+		case S_ABSOLUTE_VALUE: {
+			result = fmt(boost::multiprecision::abs(args[0]));
+			break;
+		}
 		case S_LN: {
 			auto *op = new NaturalLogarithm(args);
 			
@@ -512,7 +516,6 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 		case S_PRINT: {
 			for (auto &arg : args) {
 				cout << arg;
-				cout << " ";
 			}
 			cout << endl;
 			break;
@@ -532,9 +535,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 		}
 		case S_FOR: {
 			string loopVarName = args[0];
-			Integer loopVarValue;
-			Integer loopEndValue;
-			Integer loopStep;
+			vector<Integer> loopSpecs; //0 = loopVarValue, 1 = loopEndValue, 2 = loopStep
 			
 			if (reservedVariables.find(loopVarName) != reservedVariables.end()) {
 				cout << "SCRIPT ERROR: FOR loop attempted to redefine a reserved variable ('" << loopVarName << "')."
@@ -543,25 +544,31 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 				return;
 			}
 			
-			//TODO improve this 3x if
-			
-			if (variableExists(args[1])) {
-				loopVarValue = Integer(getVariableValue(args[1]));
-			} else {
-				loopVarValue = Integer(args[1]);
+			for (int i = 1; i < 4; i++) {
+				if (variableExists(args[i])) {
+					loopSpecs.emplace_back(Integer(getVariableValue(args[i])));
+				} else {
+					loopSpecs.emplace_back(args[i]);
+				}
 			}
 			
-			if (variableExists(args[2])) {
-				loopEndValue = Integer(getVariableValue(args[2]));
-			} else {
-				loopEndValue = Integer(args[2]);
+			/*if (loopSpecs[2] == 0) {
+				cout << "SCRIPT ERROR: For loop will never end (step is zero)." << endl;
+				script.invalidate();
+				return;
 			}
 			
-			if (variableExists(args[3])) {
-				loopStep = Integer(getVariableValue(args[3]));
-			} else {
-				loopStep = Integer(args[3]);
+			if (loopSpecs[0] < loopSpecs[1] && loopSpecs[2] < 0) {
+				cout << "SCRIPT ERROR: For loop will never end (start < end, step is negative)." << endl;
+				script.invalidate();
+				return;
 			}
+			
+			if (loopSpecs[0] > loopSpecs[1] && loopSpecs[2] > 0) {
+				cout << "SCRIPT ERROR: For loop will never end (start > end, step is positive)." << endl;
+				script.invalidate();
+				return;
+			}*/
 			
 			bool loopVarPreExisting = variables.find(loopVarName) != variables.end();
 			string loopVarPreValue;
@@ -575,20 +582,21 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			
 			uint32_t resetPos;
 			
-			while ((loopStep > 0 && loopVarValue < loopEndValue) || (loopStep < 0 && loopVarValue > loopEndValue)) {
+			while ((loopSpecs[2] > 0 && loopSpecs[0] < loopSpecs[1]) ||
+			       (loopSpecs[2] < 0 && loopSpecs[0] > loopSpecs[1])) {
 				if (!script.isValid()) {
 					cout << "SCRIPT ERROR: End of FOR loop iteration code not marked by ENDFOR." << endl;
 					script.invalidate();
 					return;
 				}
 				
-				updateVariable(loopVarName, fmt(loopVarValue));
+				updateVariable(loopVarName, fmt(loopSpecs[0]));
 				
 				Command command = script.nextCommand();
 				
 				if (command.first == S_ENDFOR) {
 					resetPos = script.getPosition();
-					loopVarValue += loopStep;
+					loopSpecs[0] += loopSpecs[2];
 					script.jump(loopStack.back());
 					continue;
 				}

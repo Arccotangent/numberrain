@@ -4,6 +4,8 @@
 
 BEGIN;
 
+DISABLEWORK;
+
 CMP argcount 0;
 JEQ noArgs;
 
@@ -26,7 +28,7 @@ ASSIGN sum;
 ENDFOR;
 
 PRINT "";
-PRINT "sum of first" arg_0 "terms of the harmonic series is" sum;
+PRINT "sum of first " arg_0 " terms of the harmonic series is " sum;
 PRINT "";
 JMP end;
 

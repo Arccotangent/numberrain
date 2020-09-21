@@ -20,6 +20,7 @@ The following is a list of operations supported by the scripting engine.
 - `MOD` (Modulus aka division remainder)
 - `GCD` (Greatest common denominator aka greatest common factor (GCF))
 - `LCM` (Least common multiple)
+- `ABS` (Store the absolute value of the argument in the result register) (scripting exclusive)
 
 ### Algebra
 

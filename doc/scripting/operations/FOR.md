@@ -8,7 +8,6 @@
 
 All of the following criteria must be met for a valid for loop:
 - End of iteration code signaled by an `ENDFOR` operation
-- Finite amount of iterations
 - Start, end, and step are integers
 
 If any of these criteria are not met, the script will either crash or never finish.

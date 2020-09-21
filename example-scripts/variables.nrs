@@ -14,13 +14,12 @@ DIV var2 var1;
 ASSIGN final;
 
 # quotes force a word to be interpreted literally, not as a variable even if it exists
-PRINT "var1" = var1;
-PRINT "var2" = var2;
-PRINT "final" = final;
+PRINT "var1 " = var1;
+PRINT "var2 " = var2;
+PRINT "final " = final;
 
 # quotes also force everything between them to be interpreted as one argument
-# beware of spaces
 # this will print "final result is <value>" with <value> being the value in the 'final' variable
-PRINT "final result is" final;
+PRINT "final result is " final;
 
 END;

@@ -44,6 +44,7 @@ enum ScriptOperation {
 	S_MODULUS,
 	S_GREATEST_COMMON_DENOMINATOR,
 	S_LEAST_COMMON_MULTIPLE,
+	S_ABSOLUTE_VALUE,
 	
 	S_LN,
 	S_LOG10,
@@ -159,7 +160,7 @@ public:
 	
 	Command nextCommand();
 	
-	int getPosition() const;
+	[[nodiscard]] int getPosition() const;
 	
 	void jump(uint32_t position);
 };

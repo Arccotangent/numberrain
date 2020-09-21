@@ -17,6 +17,6 @@ ASSIGN sum;
 
 ENDFOR;
 
-PRINT "final sum is" sum;
+PRINT "final sum is " sum;
 
 END;

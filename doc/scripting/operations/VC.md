@@ -9,6 +9,8 @@ It can be used to construct vectors from variables.
 
 The y and z parameters are optional and default to 0 if omitted.
 
+`VC` can be thought of as the vector equivalent of `NOP`.
+
 ## Usage
 
 `VC <x> [y] [z];`

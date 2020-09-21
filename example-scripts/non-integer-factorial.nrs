@@ -1,13 +1,19 @@
 # evaluate factorials for non-integers using euler's infinite product
-# requires large amount of terms due to very slow convergence
+# requires a very large amount of terms for good accuracy due to very slow convergence
+# because of the large amount of terms, this script takes a considerable amount of time to finish
 
 !PRECISION 100
 
 BEGIN;
 
+DISABLEWORK;
+
+CMP argcount 1;
+JLT argerr;
+
 # customize
 
-NOP 10;
+NOP arg_0;
 ASSIGN arg;
 
 NOP 250000;
@@ -41,10 +47,47 @@ ASSIGN term;
 MUL res term;
 ASSIGN res;
 
+PRINT "finished term " k;
+
 ENDFOR;
 
+ROUND arg;
+ASSIGN argInt;
+
+CMP arg argInt;
+JEQ int;
+
 PRINT "";
-PRINT "factorial of" arg "is approximately" res;
+PRINT "factorial of " arg " is approximately " res;
 PRINT "";
+JMP end;
+
+MARK int;
+FCT argInt;
+ASSIGN realFactorial;
+
+SUB realFactorial res;
+ASSIGN errorNumer;
+
+ABS errorNumer;
+ASSIGN errorNumer;
+
+DIV errorNumer realFactorial;
+ASSIGN error;
+
+MUL error 100;
+ASSIGN error;
+
+PRINT "";
+PRINT "factorial of " arg " is approximately " res;
+PRINT "real factorial of " arg " is " realFactorial;
+PRINT "the percent error is" error " percent";
+PRINT "";
+JMP end;
+
+MARK argerr;
+PRINT "non-integer-factorial <number>";
+
+MARK end;
 
 END;

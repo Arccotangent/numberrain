@@ -26,7 +26,7 @@ ASSIGN res;
 
 ENDFOR;
 
-PRINT "evaluated" a "tetrated to" b;
-PRINT "final result is" res;
+PRINT "evaluated " a " tetrated to " b;
+PRINT "final result is " res;
 
 END;

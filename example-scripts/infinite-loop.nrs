@@ -28,7 +28,7 @@ CMP frac 0;
 JGT loopBegin; # loop ends here
 
 PRINT "";
-PRINT "loop has ended after" terms "iterations";
+PRINT "loop has ended after " terms " iterations";
 PRINT "";
 
 END;

@@ -29,6 +29,6 @@ JMP func1; # "call" the pseudo-function
 
 MARK func1return;
 
-PRINT "func1 returned" return;
+PRINT "func1 returned " return;
 
 END;

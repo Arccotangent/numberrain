@@ -4,7 +4,7 @@ The following is a guide on how to develop basic Numberrain scripts.
 
 ## Example Script
 
-This is the completed script (also in `example-scripts`):
+This is an example script (located in `example-scripts/2-plus-2.nrs`):
 
 ```
 # basics of Numberrain scripting
@@ -35,15 +35,17 @@ END;
 
 `ADD 2 2;` - Add 2 + 2 and store the sum (4) in the result register.
 
-`ASSIGN sum;` - Assign the value in the result register into a variable called `sum`.
+`ASSIGN sum; # store result in variable called sum` - Assign the value in the result register into a variable called `sum`.
+Everything after the `#` is a comment and thus ignored.
 
-`PRINT sum;` - Print the value stored in `sum`.
+`PRINT sum; # print value stored in sum` - Print the value stored in `sum`.
+Like the previous line, everything after the `#` is a comment and thus ignored.
 
-`END;` - End the script. Everything after an `END` instruction is ignored.
+`END;` - End the script. Everything in the file after an `END` instruction is ignored.
 
 ## Developing Your Own Scripts
 
-Read the below information, then read the documentation in `doc/scripting/preoperations` and `doc/scripting/operations` as needed.
+Read the below information, then read the documentation in `doc/scripting/preoperations` and `doc/scripting/operations` as needed. 
 
 ### Parts of a Script
 
@@ -71,3 +73,12 @@ The result register can then be stored in a variable using the `ASSIGN` operatio
 
 After the main script is complete, it should be ended with an `END` operation.
 Everything after an `END` operation is ignored.
+
+### Operations
+
+Every statement in a Numberrain script begins with the operation in all capital letters followed by the arguments and finally terminated with a semicolon (`;`).
+
+`ADD 2 k;` - Calls the `ADD` operation to add 2 to the value stored in a variable named `k`.
+The semicolon (`;`) signifies the end of the statement.
+
+`Add 2 k;` - Invalid statement - the operation name is not in all caps.
