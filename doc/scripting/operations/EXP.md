@@ -11,7 +11,7 @@ From there, the result can be assigned to a variable using `ASSIGN`.
 
 ## Usage
 
-`EXP <number 1> <number 2> ... <number n>;`
+`EXP <real number 1> <real number 2> ... [real number n];`
 
 ## Examples
 

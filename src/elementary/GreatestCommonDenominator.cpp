@@ -19,18 +19,20 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger GreatestCommonDenominator::log = Logger("GreatestCommonDenominator");
+
 long GreatestCommonDenominator::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Integer a = arguments[0];
 	Integer b = arguments[1];
-	cout << "Evaluating greatest common denominator, starting from " << fmt(a) << " and " << fmt(b) << "." << endl;
+	log.i("Evaluating greatest common denominator, starting from %s and %s.", fmt(a).c_str(), fmt(b).c_str());
 	
 	for (size_t i = 1; i < arguments.size(); i++) {
 		b = arguments[i];
 		Integer newGCD = gcd(a, b);
-		cout << "GCD is currently " << fmt(a) << ", after argument " << i << " (" << fmt(b) << "): gcd(" << fmt(a)
-		     << ", " << fmt(b) << ") = " << fmt(newGCD) << endl;
+		log.r("GCD is currently %s, after argument %i (%s): gcd(%s, %s) = %s", fmt(a).c_str(), i, fmt(b).c_str(),
+		      fmt(a).c_str(), fmt(b).c_str(), fmt(newGCD).c_str());
 		a = newGCD;
 	}
 	

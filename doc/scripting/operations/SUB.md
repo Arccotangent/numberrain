@@ -9,7 +9,7 @@ From there, the result can be assigned to a variable using `ASSIGN`.
 
 ## Usage
 
-`SUB <real number 1> <real number 2> ... <real number n>;`
+`SUB <real number 1> <real number 2> ... [real number n];`
 
 ## Examples
 

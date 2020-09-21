@@ -275,6 +275,7 @@ void ScriptEngine::executeRealOperation(ScriptOperation operation, const vector<
 			
 			op->eval();
 			result = fmt(op->getResult());
+			break;
 		}
 		case S_LN: {
 			auto *op = new NaturalLogarithm(args);
@@ -337,6 +338,37 @@ void ScriptEngine::executeRealOperation(ScriptOperation operation, const vector<
 			
 			op->eval();
 			result = fmt(op->getResult());
+			break;
+		}
+		case S_VECTOR_CONSTRUCT: {
+			Vector vec;
+			
+			vec.x = args[0];
+			vec.y = args.size() >= 2 ? args[1] : 0.0;
+			vec.z = args.size() >= 3 ? args[2] : 0.0;
+			
+			result = fmt(vec);
+			break;
+		}
+		case S_FLOOR: {
+			result = fmt(boost::multiprecision::floor(args[0]));
+			break;
+		}
+		case S_CEIL: {
+			result = fmt(boost::multiprecision::ceil(args[0]));
+			break;
+		}
+		case S_ROUND: {
+			result = fmt(boost::multiprecision::round(args[0]));
+			break;
+		}
+		case S_DROUND: {
+			Real coeff = boost::multiprecision::pow(Real(10), args[1]);
+			Real toRound = args[0] * coeff;
+			Real rounded = boost::multiprecision::round(toRound);
+			rounded /= coeff;
+			
+			result = fmt(rounded);
 			break;
 		}
 		case S_COMPARE: {
@@ -659,6 +691,14 @@ void ScriptEngine::executeVoidOperation(ScriptOperation operation) {
 		case S_ENDFOR: {
 			//should never be executed
 			cout << "For loop ended." << endl;
+			break;
+		}
+		case S_DISABLEWORK: {
+			GlobalVars::getInstance()->setShowWork(false);
+			break;
+		}
+		case S_ENABLEWORK: {
+			GlobalVars::getInstance()->setShowWork(true);
 			break;
 		}
 		case END_EXEC: {

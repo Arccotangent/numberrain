@@ -21,6 +21,8 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #include "../IntegerOperation.h"
 
 class GreatestCommonDenominator : public virtual IntegerOperation {
+private:
+	static Logger log;
 public:
 	const size_t minArgs = 2;
 	using IntegerOperation::IntegerOperation;

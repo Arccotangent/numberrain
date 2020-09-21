@@ -19,12 +19,14 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #define NUMBERRAIN_SCRIPTREADER_H
 
 #include "Script.h"
+#include "../logging/Logger.h"
 #include <string>
 #include <map>
 #include <filesystem>
 
 class ScriptReader {
 private:
+	static Logger log;
 	std::string filename;
 	
 	static std::map<std::string, PreScriptOperation> preOpcodes;

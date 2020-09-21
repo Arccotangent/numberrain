@@ -1,7 +1,6 @@
-# DISABLEWORK (future)
+# DISABLEWORK
 
-`DISABLEWORK` is a future special operation.
-It is currently not implemented.
+`DISABLEWORK` is a special operation.
 
 ## Description
 

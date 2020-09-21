@@ -19,17 +19,19 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger Subtraction::log = Logger("Subtraction");
+
 long Subtraction::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Real difference = arguments[0];
-	cout << "Subtracting numbers, starting from " << fmt(difference) << "." << endl;
+	log.i("Subtracting numbers, starting from %s.", fmt(difference).c_str());
 	
 	for (size_t i = 1; i < arguments.size(); i++) {
 		Real arg = arguments[i];
 		Real newDiff = difference - arg;
-		cout << "Difference is currently " << fmt(difference) << ", after argument " << i << " (" << fmt(arg) << "): "
-		     << fmt(difference) << " - " << fmt(arg) << " = " << fmt(newDiff) << endl;
+		log.r("Difference is currently %s, after argument %i (%s): %s - %s = %s", fmt(difference).c_str(), i,
+		      fmt(arg).c_str(), fmt(difference).c_str(), fmt(arg).c_str(), fmt(newDiff).c_str());
 		difference = newDiff;
 	}
 	

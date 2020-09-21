@@ -22,11 +22,13 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #include <chrono>
 #include <iostream>
 #include "Structures.h"
+#include "logging/Logger.h"
 
 class IntegerOperation {
 protected:
 	std::vector<Integer> arguments;
 	Integer result = 0;
+	static Logger log;
 
 public:
 	explicit IntegerOperation(const std::vector<Integer> &arguments);

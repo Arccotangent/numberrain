@@ -17,6 +17,8 @@ set(NUMBERRAIN_SOURCES
         src/IntegerOperation.cpp src/IntegerOperation.h
         src/VectorOperation.cpp src/VectorOperation.h
         src/StringOperation.cpp src/StringOperation.h
+        src/GlobalVars.cpp src/GlobalVars.h
+        src/logging/Logger.cpp src/logging/Logger.h
         src/elementary/Addition.cpp src/elementary/Addition.h
         src/elementary/Subtraction.cpp src/elementary/Subtraction.h
         src/elementary/Multiplication.cpp src/elementary/Multiplication.h
@@ -45,8 +47,7 @@ set(NUMBERRAIN_SOURCES
         src/vector/VectorRectangularToPolar.cpp src/vector/VectorRectangularToPolar.h
         src/scripting/ScriptEngine.cpp src/scripting/ScriptEngine.h
         src/scripting/Script.cpp src/scripting/Script.h
-        src/scripting/ScriptReader.cpp src/scripting/ScriptReader.h
-        )
+        src/scripting/ScriptReader.cpp src/scripting/ScriptReader.h)
 
 add_executable(numberrain ${NUMBERRAIN_SOURCES})
 

@@ -10,7 +10,7 @@ From there, the result can be assigned to a variable using `ASSIGN`.
 ## Usage
 
 ```
-ADD <real number 1> <real number 2> ... <real number n>;
+ADD <real number 1> <real number 2> ... [real number n];
 ```
 
 ## Examples

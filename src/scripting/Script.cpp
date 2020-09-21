@@ -19,58 +19,68 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
-map<PreScriptOperation, pair<int, CountRuleType>> Script::preOpArgCounts = {
-		{PRECISION,     {1,  EQUAL}},
-		{INVALID_PREOP, {-1, LESS_THAN}}
+//format = {OPERATION, {minArgs, maxArgs}}
+//-1 minArgs means invalid operation (since actual minimum is zero // cannot have negative argument count)
+//-1 maxArgs means no maximum
+map<PreScriptOperation, pair<int, int>> Script::preOpArgCounts = {
+		{PRECISION,     {1,  1}},
+		{INVALID_PREOP, {-1, -1}}
 };
 
-map<ScriptOperation, pair<int, CountRuleType>> Script::opArgCounts = {
-		{BEGIN_EXEC,                      {0,  EQUAL}},
-		{S_ADD,                           {2,  GREATER_THAN_OR_EQUAL_TO}},
-		{S_SUBTRACT,                      {2,  GREATER_THAN_OR_EQUAL_TO}},
-		{S_MULTIPLY,                      {2,  GREATER_THAN_OR_EQUAL_TO}},
-		{S_DIVIDE,                        {2,  GREATER_THAN_OR_EQUAL_TO}},
-		{S_EXPONENT,                      {2,  GREATER_THAN_OR_EQUAL_TO}},
-		{S_SQRT,                          {1,  EQUAL}},
-		{S_FACTORIAL,                     {1,  EQUAL}},
-		{S_MODULUS,                       {2,  GREATER_THAN_OR_EQUAL_TO}},
-		{S_GREATEST_COMMON_DENOMINATOR,   {2,  GREATER_THAN_OR_EQUAL_TO}},
-		{S_LEAST_COMMON_MULTIPLE,         {2,  GREATER_THAN_OR_EQUAL_TO}},
-		{S_LN,                            {1,  EQUAL}},
-		{S_LOG10,                         {1,  EQUAL}},
-		{S_LOGB,                          {2,  EQUAL}},
-		{S_SINE,                          {1,  EQUAL}},
-		{S_COSINE,                        {1,  EQUAL}},
-		{S_TANGENT,                       {1,  EQUAL}},
-		{S_ARCSINE,                       {2,  EQUAL}},
-		{S_ARCCOSINE,                     {2,  EQUAL}},
-		{S_ARCTANGENT,                    {2,  EQUAL}},
-		{S_VECTOR_ADD,                    {2,  GREATER_THAN_OR_EQUAL_TO}},
-		{S_VECTOR_SUBTRACT,               {2,  GREATER_THAN_OR_EQUAL_TO}},
-		{S_VECTOR_SCALAR_MULTIPLY,        {2,  EQUAL}},
-		{S_VECTOR_DOT_PRODUCT,            {2,  EQUAL}},
-		{S_VECTOR_CROSS_PRODUCT,          {2,  GREATER_THAN_OR_EQUAL_TO}},
-		{S_VECTOR_POLAR_TO_RECTANGULAR,   {2,  EQUAL}},
-		{S_VECTOR_RECTANGULAR_TO_POLAR,   {1,  EQUAL}},
-		{S_VECTOR_GET_X,                  {1,  EQUAL}},
-		{S_VECTOR_GET_Y,                  {1,  EQUAL}},
-		{S_VECTOR_GET_Z,                  {1,  EQUAL}},
-		{S_PRINT,                         {1,  GREATER_THAN_OR_EQUAL_TO}},
-		{S_ASSIGN,                        {1,  EQUAL}},
-		{S_FOR,                           {4,  EQUAL}},
-		{S_ENDFOR,                        {0,  EQUAL}},
-		{S_COMPARE,                       {2,  EQUAL}},
-		{S_MARK,                          {1,  EQUAL}},
-		{S_JUMP_UNCONDITIONAL,            {1,  EQUAL}},
-		{S_JUMP_EQUAL,                    {1,  EQUAL}},
-		{S_JUMP_NOT_EQUAL,                {1,  EQUAL}},
-		{S_JUMP_LESS_THAN,                {1,  EQUAL}},
-		{S_JUMP_LESS_THAN_OR_EQUAL_TO,    {1,  EQUAL}},
-		{S_JUMP_GREATER_THAN,             {1,  EQUAL}},
-		{S_JUMP_GREATER_THAN_OR_EQUAL_TO, {1,  EQUAL}},
-		{S_NOP,                           {1,  EQUAL}},
-		{END_EXEC,                        {0,  EQUAL}},
-		{INVALID_OP,                      {-1, LESS_THAN}}
+map<ScriptOperation, pair<int, int>> Script::opArgCounts = {
+		{BEGIN_EXEC,                      {0,  0}},
+		{S_ADD,                           {2,  -1}},
+		{S_SUBTRACT,                      {2,  -1}},
+		{S_MULTIPLY,                      {2,  -1}},
+		{S_DIVIDE,                        {2,  -1}},
+		{S_EXPONENT,                      {2,  -1}},
+		{S_SQRT,                          {1,  1}},
+		{S_FACTORIAL,                     {1,  1}},
+		{S_MODULUS,                       {2,  -1}},
+		{S_GREATEST_COMMON_DENOMINATOR,   {2,  -1}},
+		{S_LEAST_COMMON_MULTIPLE,         {2,  -1}},
+		{S_LN,                            {1,  1}},
+		{S_LOG10,                         {1,  1}},
+		{S_LOGB,                          {2,  2}},
+		{S_SINE,                          {1,  1}},
+		{S_COSINE,                        {1,  1}},
+		{S_TANGENT,                       {1,  1}},
+		{S_ARCSINE,                       {2,  2}},
+		{S_ARCCOSINE,                     {2,  2}},
+		{S_ARCTANGENT,                    {2,  2}},
+		{S_VECTOR_ADD,                    {2,  -1}},
+		{S_VECTOR_SUBTRACT,               {2,  -1}},
+		{S_VECTOR_SCALAR_MULTIPLY,        {2,  2}},
+		{S_VECTOR_DOT_PRODUCT,            {2,  2}},
+		{S_VECTOR_CROSS_PRODUCT,          {2,  -1}},
+		{S_VECTOR_POLAR_TO_RECTANGULAR,   {2,  2}},
+		{S_VECTOR_RECTANGULAR_TO_POLAR,   {1,  2}},
+		{S_VECTOR_CONSTRUCT,              {1,  3}},
+		{S_VECTOR_GET_X,                  {1,  1}},
+		{S_VECTOR_GET_Y,                  {1,  1}},
+		{S_VECTOR_GET_Z,                  {1,  1}},
+		{S_PRINT,                         {1,  -1}},
+		{S_ASSIGN,                        {1,  1}},
+		{S_FOR,                           {4,  4}},
+		{S_ENDFOR,                        {0,  0}},
+		{S_FLOOR,                         {1,  1}},
+		{S_CEIL,                          {1,  1}},
+		{S_ROUND,                         {1,  1}},
+		{S_DROUND,                        {2,  2}},
+		{S_DISABLEWORK,                   {0,  0}},
+		{S_ENABLEWORK,                    {0,  0}},
+		{S_COMPARE,                       {2,  2}},
+		{S_MARK,                          {1,  1}},
+		{S_JUMP_UNCONDITIONAL,            {1,  1}},
+		{S_JUMP_EQUAL,                    {1,  1}},
+		{S_JUMP_NOT_EQUAL,                {1,  1}},
+		{S_JUMP_LESS_THAN,                {1,  1}},
+		{S_JUMP_LESS_THAN_OR_EQUAL_TO,    {1,  1}},
+		{S_JUMP_GREATER_THAN,             {1,  1}},
+		{S_JUMP_GREATER_THAN_OR_EQUAL_TO, {1,  1}},
+		{S_NOP,                           {1,  1}},
+		{END_EXEC,                        {0,  0}},
+		{INVALID_OP,                      {-1, -1}}
 };
 
 map<ScriptOperation, OperationType> Script::opTypes = {
@@ -101,13 +111,20 @@ map<ScriptOperation, OperationType> Script::opTypes = {
 		{S_VECTOR_CROSS_PRODUCT,          VECTOR_SCR},
 		{S_VECTOR_POLAR_TO_RECTANGULAR,   VECTOR_SCR},
 		{S_VECTOR_RECTANGULAR_TO_POLAR,   VECTOR_SCR},
+		{S_VECTOR_CONSTRUCT,              REAL_SCR},
 		{S_VECTOR_GET_X,                  VECTOR_SCR},
 		{S_VECTOR_GET_Y,                  VECTOR_SCR},
 		{S_VECTOR_GET_Z,                  VECTOR_SCR},
+		{S_FLOOR,                         REAL_SCR},
+		{S_CEIL,                          REAL_SCR},
+		{S_ROUND,                         REAL_SCR},
+		{S_DROUND,                        REAL_SCR},
 		{S_PRINT,                         STRING_SCR},
 		{S_ASSIGN,                        STRING_SCR},
 		{S_FOR,                           STRING_SCR},
 		{S_ENDFOR,                        VOID_SCR},
+		{S_DISABLEWORK,                   VOID_SCR},
+		{S_ENABLEWORK,                    VOID_SCR},
 		{S_COMPARE,                       REAL_SCR},
 		{S_MARK,                          STRING_SCR},
 		{S_JUMP_UNCONDITIONAL,            STRING_SCR},
@@ -135,21 +152,16 @@ bool Script::checkPreOpArgCount(PreScriptOperation operation, uint32_t argCount)
 		return false;
 	}
 	
-	pair<int, CountRuleType> rule = preOpArgCounts[operation];
+	pair<int, int> argCountBounds = preOpArgCounts[operation];
 	
-	switch (rule.second) {
-		case EQUAL:
-			return argCount == rule.first;
-		case LESS_THAN:
-			return argCount < rule.first;
-		case LESS_THAN_OR_EQUAL_TO:
-			return argCount <= rule.first;
-		case GREATER_THAN:
-			return argCount > rule.first;
-		case GREATER_THAN_OR_EQUAL_TO:
-			return argCount >= rule.first;
-		default:
-			return false;
+	if (argCountBounds.first < 0) {
+		return false;
+	}
+	
+	if (argCountBounds.second < 0) {
+		return argCount >= argCountBounds.first;
+	} else {
+		return argCount >= argCountBounds.first && argCount <= argCountBounds.second;
 	}
 }
 
@@ -158,21 +170,16 @@ bool Script::checkOpArgCount(ScriptOperation operation, uint32_t argCount) {
 		return false;
 	}
 	
-	pair<int, CountRuleType> rule = opArgCounts[operation];
+	pair<int, int> argCountBounds = opArgCounts[operation];
 	
-	switch (rule.second) {
-		case EQUAL:
-			return argCount == rule.first;
-		case LESS_THAN:
-			return argCount < rule.first;
-		case LESS_THAN_OR_EQUAL_TO:
-			return argCount <= rule.first;
-		case GREATER_THAN:
-			return argCount > rule.first;
-		case GREATER_THAN_OR_EQUAL_TO:
-			return argCount >= rule.first;
-		default:
-			return false;
+	if (argCountBounds.first < 0) {
+		return false;
+	}
+	
+	if (argCountBounds.second < 0) {
+		return argCount >= argCountBounds.first;
+	} else {
+		return argCount >= argCountBounds.first && argCount <= argCountBounds.second;
 	}
 }
 

@@ -19,17 +19,19 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger Multiplication::log = Logger("Multiplication");
+
 long Multiplication::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Real product = arguments[0];
-	cout << "Multiplying numbers, starting from " << fmt(product) << "." << endl;
+	log.i("Multiplying numbers, starting from %s.", fmt(product).c_str());
 	
 	for (size_t i = 1; i < arguments.size(); i++) {
 		Real arg = arguments[i];
 		Real newProd = product * arg;
-		cout << "Product is currently " << fmt(product) << ", after argument " << i << " (" << fmt(arg) << "): "
-		     << fmt(product) << " * " << fmt(arg) << " = " << fmt(newProd) << endl;
+		log.r("Product is currently %s, after argument %i (%s): %s * %s = %s", fmt(product).c_str(), i,
+		      fmt(arg).c_str(), fmt(product).c_str(), fmt(arg).c_str(), fmt(newProd).c_str());
 		product = newProd;
 	}
 	

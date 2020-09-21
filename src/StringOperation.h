@@ -22,6 +22,7 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #include <chrono>
 #include <iostream>
 #include "Structures.h"
+#include "logging/Logger.h"
 
 class StringOperation {
 protected:

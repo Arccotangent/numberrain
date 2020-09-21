@@ -9,7 +9,7 @@
 ## Usage
 
 ```
-MOD <integer 1> <integer 2> ... <integer n>;
+MOD <integer 1> <integer 2> ... [integer n];
 ```
 
 ## Examples

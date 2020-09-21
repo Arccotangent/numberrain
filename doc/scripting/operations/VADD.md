@@ -8,7 +8,7 @@
 
 ## Usage
 
-`VADD <vector 1> <vector 2> ... <vector n>;`
+`VADD <vector 1> <vector 2> ... [vector n];`
 
 ## Examples
 

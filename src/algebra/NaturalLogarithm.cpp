@@ -19,14 +19,16 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger NaturalLogarithm::log = Logger("NaturalLogarithm");
+
 long NaturalLogarithm::eval() {
 	auto start = chrono::system_clock::now();
 	
-	cout << "Evaluating ln(" << fmt(arguments[0]) << ")" << endl;
+	log.i("Evaluating ln(%s)", fmt(arguments[0]).c_str());
 	
 	result = boost::multiprecision::log(arguments[0]);
 	
-	cout << "Final result is " << fmt(result) << endl;
+	log.i("Final result is %s", fmt(result).c_str());
 	
 	auto end = chrono::system_clock::now();
 	

@@ -20,10 +20,12 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "../StringOperation.h"
 #include "Script.h"
+#include "../logging/Logger.h"
 #include <map>
 
 class ScriptEngine : public virtual StringOperation {
 private:
+	static Logger log;
 	std::deque<int> loopStack;
 	Script script;
 	

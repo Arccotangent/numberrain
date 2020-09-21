@@ -9,7 +9,7 @@
 ## Usage
 
 ```
-LCM <integer 1> <integer 2> ... <integer n>;
+LCM <integer 1> <integer 2> ... [integer n];
 ```
 
 ## Examples

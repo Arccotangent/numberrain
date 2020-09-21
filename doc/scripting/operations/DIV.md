@@ -9,7 +9,7 @@ From there, the result can be assigned to a variable using `ASSIGN`.
 
 ## Usage
 
-`DIV <real number 1> <real number 2> ... <real number n>;`
+`DIV <real number 1> <real number 2> ... [real number n];`
 
 ## Examples
 

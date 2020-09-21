@@ -19,20 +19,22 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger CustomBaseLogarithm::log = Logger("CustomBaseLogarithm");
+
 long CustomBaseLogarithm::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Real base = arguments[0];
 	Real num = arguments[1];
 	
-	cout << "Evaluating log_" << fmt(base) << "(" << fmt(num) << ")" << endl;
+	log.i("Evaluating log_%s(%s)", fmt(base).c_str(), fmt(num).c_str());
 	
-	cout << "Change of base formula: log_base(num) = log10(num) / log10(base)" << endl;
-	cout << "Evaluating log10(" << fmt(num) << ") / log10(" << fmt(base) << ")" << endl;
+	log.r("Change of base formula: log_base(num) = log10(num) / log10(base)");
+	log.r("Evaluating log10(%s) / log10(%s)", fmt(num).c_str(), fmt(base).c_str());
 	
 	result = boost::multiprecision::log10(num) / boost::multiprecision::log10(base);
 	
-	cout << "Final result is " << fmt(result) << endl;
+	log.i("Final result is %s", fmt(result).c_str());
 	
 	auto end = chrono::system_clock::now();
 	

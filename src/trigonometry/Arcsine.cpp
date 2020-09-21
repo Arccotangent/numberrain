@@ -19,12 +19,15 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger Arcsine::log = Logger("Arcsine");
+
 long Arcsine::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Real opposite = arguments[0];
 	Real hypotenuse = arguments[1];
-	cout << "Evaluating the arcsine of opposite leg " << fmt(opposite) << " and hypotenuse " << fmt(hypotenuse) << endl;
+	log.i("Evaluating the arcsine of opposite leg %s and hypotenuse %s", fmt(opposite).c_str(),
+	      fmt(hypotenuse).c_str());
 	
 	result = boost::multiprecision::asin(opposite / hypotenuse);
 	

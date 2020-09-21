@@ -19,17 +19,19 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger Division::log = Logger("Division");
+
 long Division::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Real quotient = arguments[0];
-	cout << "Dividing numbers, starting from " << fmt(quotient) << "." << endl;
+	log.i("Dividing numbers, starting from %s.", fmt(quotient).c_str());
 	
 	for (size_t i = 1; i < arguments.size(); i++) {
 		Real arg = arguments[i];
 		Real newQuot = quotient / arg;
-		cout << "Quotient is currently " << fmt(quotient) << ", after argument " << i << " (" << fmt(arg) << "): "
-		     << fmt(quotient) << " / " << fmt(arg) << " = " << fmt(newQuot) << endl;
+		log.r("Quotient is currently %s, after argument %i (%s): %s / %s = %s", fmt(quotient).c_str(), i,
+		      fmt(arg).c_str(), fmt(quotient).c_str(), fmt(arg).c_str(), fmt(newQuot).c_str());
 		quotient = newQuot;
 	}
 	

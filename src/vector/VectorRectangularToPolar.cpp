@@ -19,6 +19,8 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger VectorRectangularToPolar::log = Logger("VectorRectangularToPolar");
+
 long VectorRectangularToPolar::eval() {
 	auto start = chrono::system_clock::now();
 	
@@ -48,13 +50,13 @@ long VectorRectangularToPolar::eval() {
 	Real magnitude = boost::multiprecision::hypot(boost::multiprecision::abs(arguments[0].x),
 	                                              boost::multiprecision::abs(arguments[0].y));
 	
-	cout << "Angle = arctan(" << fmt(arguments[0].y) << " / " << fmt(arguments[0].x) << ") = " << fmt(angle) << " deg"
-	     << endl;
-	cout << "Magnitude = sqrt((" << fmt(boost::multiprecision::abs(arguments[0].x)) << ")^2 + ("
-	     << fmt(boost::multiprecision::abs(arguments[0].y)) << ")^2)" << endl;
+	log.r("Angle = arctan(%s / %s) = %s deg", fmt(arguments[0].y).c_str(), fmt(arguments[0].x).c_str(),
+	      fmt(angle).c_str());
+	log.r("Magnitude = sqrt((%s)^2 + (%s)^2)", fmt(boost::multiprecision::abs(arguments[0].x)).c_str(),
+	      fmt(boost::multiprecision::abs(arguments[0].y)).c_str());
 	
-	cout << "The answer is returned as a vector." << endl;
-	cout << "The format is: angle * i, magnitude * j, 0 * k" << endl;
+	log.r("The answer is returned as a vector.");
+	log.r("The format is: angle * i, magnitude * j, 0 * k");
 	
 	Vector vec(angle, magnitude, 0);
 	

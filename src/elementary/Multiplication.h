@@ -21,6 +21,8 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #include "../RealOperation.h"
 
 class Multiplication : public virtual RealOperation {
+private:
+	static Logger log;
 public:
 	using RealOperation::RealOperation;
 	

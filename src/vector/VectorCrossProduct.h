@@ -21,6 +21,8 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #include "../VectorOperation.h"
 
 class VectorCrossProduct : public virtual VectorOperation {
+private:
+	static Logger log;
 public:
 	using VectorOperation::VectorOperation;
 	

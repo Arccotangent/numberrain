@@ -15,19 +15,24 @@ You should have received a copy of the GNU Affero General Public License
 along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NUMBERRAIN_VECTORPOLARTORECTANGULAR_H
-#define NUMBERRAIN_VECTORPOLARTORECTANGULAR_H
+#ifndef NUMBERRAIN_GLOBALVARS_H
+#define NUMBERRAIN_GLOBALVARS_H
 
-#include "../VectorOperation.h"
+#include <string>
 
-class VectorPolarToRectangular : public virtual VectorOperation {
+class GlobalVars {
 private:
-	static Logger log;
-public:
-	using VectorOperation::VectorOperation;
+	bool showWork = true;
 	
-	long eval() override;
+	GlobalVars() = default;
+
+public:
+	static GlobalVars *getInstance();
+	
+	void setShowWork(bool showWork);
+	
+	bool shouldShowWork();
 };
 
 
-#endif //NUMBERRAIN_VECTORPOLARTORECTANGULAR_H
+#endif //NUMBERRAIN_GLOBALVARS_H

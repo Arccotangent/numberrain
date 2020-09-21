@@ -15,19 +15,33 @@ You should have received a copy of the GNU Affero General Public License
 along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NUMBERRAIN_VECTORPOLARTORECTANGULAR_H
-#define NUMBERRAIN_VECTORPOLARTORECTANGULAR_H
+#ifndef NUMBERRAIN_LOGGER_H
+#define NUMBERRAIN_LOGGER_H
 
-#include "../VectorOperation.h"
+#include <cstdio>
+#include <string>
+#include <cstdarg>
+#include "../GlobalVars.h"
 
-class VectorPolarToRectangular : public virtual VectorOperation {
+class Logger {
 private:
-	static Logger log;
-public:
-	using VectorOperation::VectorOperation;
+	std::string tag;
 	
-	long eval() override;
+	static std::string format(const char *msg, va_list args);
+
+public:
+	explicit Logger(const std::string &tag);
+	
+	void e(const char *msg, ...);
+	
+	void w(const char *msg, ...);
+	
+	void i(const char *msg, ...);
+	
+	void d(const char *msg, ...);
+	
+	void r(const char *msg, ...);
 };
 
 
-#endif //NUMBERRAIN_VECTORPOLARTORECTANGULAR_H
+#endif //NUMBERRAIN_LOGGER_H

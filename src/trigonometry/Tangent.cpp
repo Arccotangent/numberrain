@@ -19,11 +19,17 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger Tangent::log = Logger("Tangent");
+
 long Tangent::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Real theta = arguments[0];
-	cout << "Evaluating the tangent of angle " << fmt(theta) << " degrees." << endl;
+	log.i("Evaluating the tangent of angle %s degrees.", fmt(theta).c_str());
+	
+	while (theta < 0) {
+		theta += 360;
+	}
 	
 	Real usedAngle = theta;
 	

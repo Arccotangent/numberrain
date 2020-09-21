@@ -19,25 +19,27 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger VectorScalarMultiplication::log = Logger("VectorScalarMultiplication");
+
 long VectorScalarMultiplication::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Real a = arguments[0].x;
 	Vector b = arguments[1];
-	cout << "Multiplying scalar A, " << fmt(a) << ", by vector B, (" << fmt(b) << ")." << endl;
-	cout << "Vector/Scalar Product = ABx * i + ABy * j + ABz * k // yields a vector value" << endl;
+	log.i("Multiplying scalar A, %s, by vector B, (%s).", fmt(a).c_str(), fmt(b).c_str());
+	log.r("Vector/Scalar Product = ABx * i + ABy * j + ABz * k // yields a vector value");
 	
 	Real newX = a * b.x;
-	cout << "Product x = " << fmt(a) << " * " << fmt(b.x) << " = " << fmt(newX) << endl;
+	log.r("Product x = %s * %s = %s", fmt(a).c_str(), fmt(b.x).c_str(), fmt(newX).c_str());
 	
 	Real newY = a * b.y;
-	cout << "Product y = " << fmt(a) << " * " << fmt(b.y) << " = " << fmt(newY) << endl;
+	log.r("Product y = %s * %s = %s", fmt(a).c_str(), fmt(b.y).c_str(), fmt(newY).c_str());
 	
 	Real newZ = a * b.z;
-	cout << "Product z = " << fmt(a) << " * " << fmt(b.z) << " = " << fmt(newZ) << endl;
+	log.r("Product z = %s * %s = %s", fmt(a).c_str(), fmt(b.z).c_str(), fmt(newZ).c_str());
 	
 	Vector product(newX, newY, newZ);
-	cout << "Final Product = " << fmt(product) << endl;
+	log.r("Final Product = %s", fmt(product).c_str());
 	
 	auto end = chrono::system_clock::now();
 	

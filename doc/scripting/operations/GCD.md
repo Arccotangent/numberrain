@@ -9,7 +9,7 @@
 ## Usage
 
 ```
-GCD <integer 1> <integer 2> ... <integer n>;
+GCD <integer 1> <integer 2> ... [integer n];
 ```
 
 ## Examples

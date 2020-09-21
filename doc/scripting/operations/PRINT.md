@@ -13,7 +13,7 @@ So if there is a variable called `sum` with `5` in it, the statement `PRINT the 
 
 ## Usage
 
-`PRINT <text/variable 1> <text/variable 2> ... <text/variable n>;`
+`PRINT <text/variable 1> [text/variable 2] ... [text/variable n];`
 
 ## Examples
 

@@ -19,18 +19,20 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger LeastCommonMultiple::log = Logger("LeastCommonMultiple");
+
 long LeastCommonMultiple::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Integer a = arguments[0];
 	Integer b = arguments[1];
-	cout << "Evaluating least common multiple, starting from " << a.str() << " and " << b.str() << "." << endl;
+	log.i("Evaluating least common multiple, starting from %s and %s.", fmt(a).c_str(), fmt(b).c_str());
 	
 	for (size_t i = 1; i < arguments.size(); i++) {
 		b = arguments[i];
 		Integer newLCM = lcm(a, b);
-		cout << "LCM is currently " << a.str() << ", after argument " << i << " (" << b.str() << "): lcm(" << a.str()
-		     << ", " << b.str() << ") = " << newLCM.str() << endl;
+		log.r("LCM is currently %s, after argument %i (%s): lcm(%s, %s) = %s", fmt(a).c_str(), i, fmt(b).c_str(),
+		      fmt(a).c_str(), fmt(b).c_str(), fmt(newLCM).c_str());
 		a = newLCM;
 	}
 	

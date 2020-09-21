@@ -35,48 +35,57 @@ map<string, ScriptOperation> ScriptReader::opcodes = {
 		{"GCD",    S_GREATEST_COMMON_DENOMINATOR},
 		{"LCM",    S_LEAST_COMMON_MULTIPLE},
 		
-		{"LN",     S_LN},
-		{"LOG10",  S_LOG10},
-		{"LOGB",   S_LOGB},
+		{"LN",          S_LN},
+		{"LOG10",       S_LOG10},
+		{"LOGB",        S_LOGB},
 		
-		{"SIN",    S_SINE},
-		{"COS",    S_COSINE},
-		{"TAN",    S_TANGENT},
-		{"ARCSIN", S_ARCSINE},
-		{"ARCCOS", S_ARCCOSINE},
-		{"ARCTAN", S_ARCTANGENT},
+		{"SIN",         S_SINE},
+		{"COS",         S_COSINE},
+		{"TAN",         S_TANGENT},
+		{"ARCSIN",      S_ARCSINE},
+		{"ARCCOS",      S_ARCCOSINE},
+		{"ARCTAN",      S_ARCTANGENT},
 		
-		{"VADD",   S_VECTOR_ADD},
-		{"VSUB",   S_VECTOR_SUBTRACT},
-		{"VSMUL",  S_VECTOR_SCALAR_MULTIPLY},
-		{"VDOT",   S_VECTOR_DOT_PRODUCT},
-		{"VCROSS", S_VECTOR_CROSS_PRODUCT},
-		{"VPTR",   S_VECTOR_POLAR_TO_RECTANGULAR},
-		{"VRTP",   S_VECTOR_RECTANGULAR_TO_POLAR},
+		{"VADD",        S_VECTOR_ADD},
+		{"VSUB",        S_VECTOR_SUBTRACT},
+		{"VSMUL",       S_VECTOR_SCALAR_MULTIPLY},
+		{"VDOT",        S_VECTOR_DOT_PRODUCT},
+		{"VCROSS",      S_VECTOR_CROSS_PRODUCT},
+		{"VPTR",        S_VECTOR_POLAR_TO_RECTANGULAR},
+		{"VRTP",        S_VECTOR_RECTANGULAR_TO_POLAR},
 		
-		{"VX",     S_VECTOR_GET_X},
-		{"VY",     S_VECTOR_GET_Y},
-		{"VZ",     S_VECTOR_GET_Z},
+		{"VC",          S_VECTOR_CONSTRUCT},
+		{"VX",          S_VECTOR_GET_X},
+		{"VY",          S_VECTOR_GET_Y},
+		{"VZ",          S_VECTOR_GET_Z},
 		
-		{"ASSIGN", S_ASSIGN},
-		{"PRINT",  S_PRINT},
+		{"FLOOR",       S_FLOOR},
+		{"CEIL",        S_CEIL},
+		{"ROUND",       S_ROUND},
+		{"DROUND",      S_DROUND},
 		
-		{"FOR",    S_FOR},
-		{"ENDFOR", S_ENDFOR},
+		{"ASSIGN",      S_ASSIGN},
+		{"PRINT",       S_PRINT},
 		
-		{"CMP",    S_COMPARE},
-		{"MARK",   S_MARK},
-		{"JMP",    S_JUMP_UNCONDITIONAL},
-		{"JEQ",    S_JUMP_EQUAL},
-		{"JNE",    S_JUMP_NOT_EQUAL},
-		{"JLT",    S_JUMP_LESS_THAN},
-		{"JLE",    S_JUMP_LESS_THAN_OR_EQUAL_TO},
-		{"JGT",    S_JUMP_GREATER_THAN},
-		{"JGE",    S_JUMP_GREATER_THAN_OR_EQUAL_TO},
+		{"FOR",         S_FOR},
+		{"ENDFOR",      S_ENDFOR},
 		
-		{"NOP",    S_NOP},
+		{"DISABLEWORK", S_DISABLEWORK},
+		{"ENABLEWORK",  S_ENABLEWORK},
 		
-		{"END",    END_EXEC}
+		{"CMP",         S_COMPARE},
+		{"MARK",        S_MARK},
+		{"JMP",         S_JUMP_UNCONDITIONAL},
+		{"JEQ",         S_JUMP_EQUAL},
+		{"JNE",         S_JUMP_NOT_EQUAL},
+		{"JLT",         S_JUMP_LESS_THAN},
+		{"JLE",         S_JUMP_LESS_THAN_OR_EQUAL_TO},
+		{"JGT",         S_JUMP_GREATER_THAN},
+		{"JGE",         S_JUMP_GREATER_THAN_OR_EQUAL_TO},
+		
+		{"NOP",         S_NOP},
+		
+		{"END",         END_EXEC}
 };
 
 map<string, PreScriptOperation> ScriptReader::preOpcodes = {
@@ -155,6 +164,8 @@ Script ScriptReader::readScript() {
 			return script;
 		}
 	}
+	
+	line++;
 	
 	stringstream scriptStr;
 	scriptStr << buf;

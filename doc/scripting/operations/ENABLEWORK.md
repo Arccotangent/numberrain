@@ -1,7 +1,6 @@
-# ENABLEWORK (future)
+# ENABLEWORK
 
-`ENABLEWORK` is a future special operation.
-It is currently not implemented.
+`ENABLEWORK` is a special operation.
 
 ## Description
 

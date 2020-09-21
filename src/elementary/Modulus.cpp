@@ -19,17 +19,19 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger Modulus::log = Logger("Modulus");
+
 long Modulus::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Integer modulus = arguments[0];
-	cout << "Evaluating modulus, starting from " << fmt(modulus) << "." << endl;
+	log.i("Evaluating modulus, starting from %s.", fmt(modulus).c_str());
 	
 	for (size_t i = 1; i < arguments.size(); i++) {
 		Integer arg = arguments[i];
 		Integer newMod = modulus % arg;
-		cout << "Modulus is currently " << fmt(modulus) << ", after argument " << i << " (" << fmt(arg) << "): "
-		     << fmt(modulus) << " mod " << fmt(arg) << " = " << fmt(newMod) << endl;
+		log.r("Modulus is currently %s, after argument %i (%s): %s mod %s = %s", fmt(modulus).c_str(), i,
+		      fmt(arg).c_str(), fmt(modulus).c_str(), fmt(arg).c_str(), fmt(newMod).c_str());
 		modulus = newMod;
 	}
 	

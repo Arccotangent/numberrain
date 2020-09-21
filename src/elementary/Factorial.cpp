@@ -19,20 +19,22 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger Factorial::log = Logger("Factorial");
+
 long Factorial::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Integer res = 1;
-	cout << "Evaluating " << arguments[0] << "!" << endl;
+	log.i("Evaluating %s!", fmt(arguments[0]).c_str());
 	
 	for (Integer i = 1; i <= arguments[0]; i++) {
 		Integer newRes = res * i;
-		cout << "Factorial so far is " << fmt(res) << " - multiplying by " << fmt(i) << " yields " << fmt(newRes)
-		     << endl;
+		log.r("Factorial so far is %s - multiplying by %s yields %s", fmt(res).c_str(), fmt(i).c_str(),
+		      fmt(res).c_str());
 		res = newRes;
 	}
 	
-	cout << "Final factorial result is " << fmt(res) << endl;
+	log.i("Final factorial result is %s", fmt(res).c_str());
 	
 	auto end = chrono::system_clock::now();
 	

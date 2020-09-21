@@ -19,17 +19,19 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger VectorAddition::log = Logger("VectorAddition");
+
 long VectorAddition::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Vector sum;
-	cout << "Adding vectors, starting with sum of 0 (zero vector)." << endl;
+	log.i("Adding vectors, starting with sum of 0 (zero vector).");
 	
 	for (size_t i = 0; i < arguments.size(); i++) {
 		Vector arg = arguments[i];
 		Vector newSum = sum + arg;
-		cout << "Sum is currently " << fmt(sum) << ", after argument " << i << " (" << fmt(arg) << "): (" << fmt(sum)
-		     << ") + (" << fmt(arg) << ") = " << fmt(newSum) << endl;
+		log.r("Sum is currently %s, after argument %i (%s): (%s) + (%s) = %s", fmt(sum).c_str(), i, fmt(arg).c_str(),
+		      fmt(sum).c_str(), fmt(arg).c_str(), fmt(newSum).c_str());
 		sum = newSum;
 	}
 	

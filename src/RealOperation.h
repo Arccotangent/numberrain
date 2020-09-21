@@ -21,6 +21,7 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <chrono>
 #include <iostream>
+#include "logging/Logger.h"
 #include "Structures.h"
 
 class RealOperation {

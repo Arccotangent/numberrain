@@ -19,13 +19,15 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger Arctangent::log = Logger("Arctangent");
+
 long Arctangent::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Real opposite = arguments[0];
 	Real adjacent = arguments[1];
-	cout << "Evaluating the arctangent of opposite leg " << fmt(opposite) << " and adjacent leg " << fmt(adjacent)
-	     << endl;
+	log.i("Evaluating the arctangent of opposite leg %s and adjacent leg %s", fmt(opposite).c_str(),
+	      fmt(adjacent).c_str());
 	
 	result = boost::multiprecision::atan(opposite / adjacent);
 	

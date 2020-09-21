@@ -19,6 +19,8 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger VectorPolarToRectangular::log = Logger("VectorPolarToRectangular");
+
 long VectorPolarToRectangular::eval() {
 	auto start = chrono::system_clock::now();
 	
@@ -46,8 +48,8 @@ long VectorPolarToRectangular::eval() {
 		vec.y = -vec.y;
 	}
 	
-	cout << "Vector x = " << fmt(magnitude) << " * cos(" << fmt(angle) << ") = " << fmt(vec.x) << endl;
-	cout << "Vector y = " << fmt(magnitude) << " * sin(" << fmt(angle) << ") = " << fmt(vec.y) << endl;
+	log.r("Vector x = %s * cos(%s) = %s", fmt(magnitude).c_str(), fmt(angle).c_str(), fmt(vec.x).c_str());
+	log.r("Vector y = %s * sin(%s) = %s", fmt(magnitude).c_str(), fmt(angle).c_str(), fmt(vec.y).c_str());
 	
 	auto end = chrono::system_clock::now();
 	

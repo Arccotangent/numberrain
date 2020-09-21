@@ -35,6 +35,8 @@ public:
 	void load();
 	
 	int getPrecision();
+	
+	bool shouldShowWork();
 };
 
 

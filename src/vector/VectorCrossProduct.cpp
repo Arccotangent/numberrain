@@ -19,13 +19,14 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger VectorCrossProduct::log = Logger("VectorCrossProduct");
+
 long VectorCrossProduct::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Vector crossProduct = arguments[0];
-	cout << "Calculating cross product, starting with vector (" << fmt(crossProduct) << ")." << endl;
-	cout << "Vector Cross Product = (AyBz - AzBy) * i + (AzBx - AxBz) * j + (AxBy - AyBx) * k // yields a vector value"
-	     << endl;
+	log.i("Calculating cross product, starting with vector (%s).", fmt(crossProduct).c_str());
+	log.r("Vector Cross Product = (AyBz - AzBy) * i + (AzBx - AxBz) * j + (AxBy - AyBx) * k // yields a vector value");
 	
 	for (size_t i = 1; i < arguments.size(); i++) {
 		Vector arg = arguments[i];
@@ -33,16 +34,16 @@ long VectorCrossProduct::eval() {
 		Real jCoeff = (crossProduct.z * arg.x) - (crossProduct.x * arg.z);
 		Real kCoeff = (crossProduct.x * arg.y) - (crossProduct.y * arg.x);
 		Vector newCrossProd(iCoeff, jCoeff, kCoeff);
-		cout << "Cross product is currently " << fmt(crossProduct) << ", after argument " << i << " (" << fmt(arg)
-		     << "): (" << fmt(crossProduct) << ") X (" << fmt(arg) << ") = " << fmt(newCrossProd) << endl;
+		log.r("Cross product is currently %s, after argument %i (%s): (%s) X (%s) = %s", fmt(crossProduct).c_str(), i,
+		      fmt(arg).c_str(), fmt(crossProduct).c_str(), fmt(arg).c_str(), fmt(newCrossProd).c_str());
 		
-		cout << "Work:" << endl;
-		cout << "\tCoefficient i = (" << fmt(crossProduct.y) << " * " << fmt(arg.z) << ") - (" << fmt(crossProduct.z)
-		     << " * " << fmt(arg.y) << ") = " << fmt(iCoeff) << endl;
-		cout << "\tCoefficient j = (" << fmt(crossProduct.z) << " * " << fmt(arg.x) << ") - (" << fmt(crossProduct.x)
-		     << " * " << fmt(arg.z) << ") = " << fmt(jCoeff) << endl;
-		cout << "\tCoefficient k = (" << fmt(crossProduct.x) << " * " << fmt(arg.y) << ") - (" << fmt(crossProduct.y)
-		     << " * " << fmt(arg.x) << ") = " << fmt(kCoeff) << endl;
+		log.r("Work:");
+		log.r("\tCoefficient i = (%s * %s) - (%s * %s) = %s", fmt(crossProduct.y).c_str(), fmt(arg.z).c_str(),
+		      fmt(crossProduct.z).c_str(), fmt(arg.y).c_str(), fmt(iCoeff).c_str());
+		log.r("\tCoefficient j = (%s * %s) - (%s * %s) = %s", fmt(crossProduct.z).c_str(), fmt(arg.x).c_str(),
+		      fmt(crossProduct.x).c_str(), fmt(arg.z).c_str(), fmt(jCoeff).c_str());
+		log.r("\tCoefficient k = (%s * %s) - (%s * %s) = %s", fmt(crossProduct.x).c_str(), fmt(arg.y).c_str(),
+		      fmt(crossProduct.y).c_str(), fmt(arg.x).c_str(), fmt(kCoeff).c_str());
 		
 		crossProduct = newCrossProd;
 	}

@@ -19,17 +19,19 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger Addition::log = Logger("Addition");
+
 long Addition::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Real sum = arguments[0];
-	cout << "Adding numbers, starting with sum of " << fmt(sum) << "." << endl;
+	log.i("Adding numbers, starting with sum of %s.", fmt(sum).c_str());
 	
 	for (size_t i = 1; i < arguments.size(); i++) {
 		Real arg = arguments[i];
 		Real newSum = sum + arg;
-		cout << "Sum is currently " << fmt(sum) << ", after argument " << i << " (" << fmt(arg) << "): " << fmt(sum)
-		     << " + " << fmt(arg) << " = " << fmt(newSum) << endl;
+		log.r("Sum is currently %s, after argument %i (%s): %s + %s = %s", fmt(sum).c_str(), i, fmt(arg).c_str(),
+		      fmt(sum).c_str(), fmt(arg).c_str(), fmt(newSum).c_str());
 		sum = newSum;
 	}
 	

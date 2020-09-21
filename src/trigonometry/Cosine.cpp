@@ -19,11 +19,17 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger Cosine::log = Logger("Cosine");
+
 long Cosine::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Real theta = arguments[0];
-	cout << "Evaluating the cosine of angle " << fmt(theta) << " degrees." << endl;
+	log.i("Evaluating the cosine of angle %s degrees.", fmt(theta).c_str());
+	
+	while (theta < 0) {
+		theta += 360;
+	}
 	
 	Real usedAngle = theta;
 	

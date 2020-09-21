@@ -19,26 +19,28 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger VectorDotProduct::log = Logger("VectorDotProduct");
+
 long VectorDotProduct::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Vector a = arguments[0];
 	Vector b = arguments[1];
-	cout << "Calculating dot product of vectors A and B: (" << fmt(a) << ") and (" << fmt(b) << ")." << endl;
-	cout << "Dot Product = AxBx + AyBy + AzBz // yields a scalar value" << endl;
+	log.i("Calculating dot product of vectors A and B: (%s) and (%s).", fmt(a).c_str(), fmt(b).c_str());
+	log.r("Dot Product = AxBx + AyBy + AzBz // yields a scalar value");
 	
 	Real xProduct = a.x * b.x;
-	cout << "AxBx = " << fmt(a.x) << " * " << fmt(b.x) << " = " << fmt(xProduct) << endl;
+	log.r("AxBx = %s * %s = %s", fmt(a.x).c_str(), fmt(b.x).c_str(), fmt(xProduct).c_str());
 	
 	Real yProduct = a.y * b.y;
-	cout << "AyBy = " << fmt(a.y) << " * " << fmt(b.y) << " = " << fmt(yProduct) << endl;
+	log.r("AyBy = %s * %s = %s", fmt(a.y).c_str(), fmt(b.y).c_str(), fmt(yProduct).c_str());
 	
 	Real zProduct = a.z * b.z;
-	cout << "AzBz = " << fmt(a.z) << " * " << fmt(b.z) << " = " << fmt(zProduct) << endl;
+	log.r("AzBz = %s * %s = %s", fmt(a.z).c_str(), fmt(b.z).c_str(), fmt(zProduct).c_str());
 	
 	Real dotProduct = xProduct + yProduct + zProduct;
-	cout << "Dot Product = " << fmt(xProduct) << " + " << fmt(yProduct) << " + " << fmt(zProduct) << " = "
-	     << fmt(dotProduct) << endl;
+	log.r("Dot Product = %s + %s + %s = %s", fmt(xProduct).c_str(), fmt(yProduct).c_str(), fmt(zProduct).c_str(),
+	      fmt(dotProduct).c_str());
 	
 	Vector dotProductVec(dotProduct);
 	

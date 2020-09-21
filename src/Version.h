@@ -18,6 +18,6 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef NUMBERRAIN_VERSION_H
 #define NUMBERRAIN_VERSION_H
 
-#define VERSION_STR "version 0.1-dev1"
+#define VERSION_STR "version 0.1-dev2"
 
 #endif //NUMBERRAIN_VERSION_H

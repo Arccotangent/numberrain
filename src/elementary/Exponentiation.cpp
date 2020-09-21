@@ -19,17 +19,19 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger Exponentiation::log = Logger("Exponentiation");
+
 long Exponentiation::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Real res = arguments[arguments.size() - 1];
-	cout << "Evaluating exponents, starting with " << fmt(res) << "." << endl;
+	log.i("Evaluating exponents, starting with %s.", fmt(res).c_str());
 	
 	for (size_t i = arguments.size() - 2; i >= 0; i--) {
 		Real arg = arguments[i];
 		Real newRes = pow(arg, res);
-		cout << "Result is currently " << fmt(res) << ", after argument " << i << "(" << fmt(arg) << "): " << fmt(arg)
-		     << "^" << fmt(res) << " = " << fmt(newRes) << endl;
+		log.r("Result is currently %s, after argument %i (%s): %s^%s = %s", fmt(res).c_str(), i, fmt(arg).c_str(),
+		      fmt(arg).c_str(), fmt(res).c_str(), fmt(newRes).c_str());
 		res = newRes;
 		
 		if (i == 0)

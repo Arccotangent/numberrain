@@ -155,6 +155,12 @@ int main(int argc, char *argv[]) {
 	
 	cout << "Precision was set to " << digits << " digits." << endl;
 	
+	bool showWork = config.shouldShowWork();
+	GlobalVars::getInstance()->setShowWork(showWork);
+	
+	cout << "Numberrain show work is " << (showWork ? "ENABLED" : "DISABLED") << " (can be overridden by scripts)"
+	     << endl;
+	
 	string operation = argv[1];
 	cout << "Operation: " + operation << endl;
 	

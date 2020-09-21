@@ -23,6 +23,7 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #include <vector>
 #include <string>
 #include "../Structures.h"
+#include "../logging/Logger.h"
 
 enum PreScriptOperation {
 	PRECISION,
@@ -63,15 +64,24 @@ enum ScriptOperation {
 	S_VECTOR_POLAR_TO_RECTANGULAR,
 	S_VECTOR_RECTANGULAR_TO_POLAR,
 	
+	S_VECTOR_CONSTRUCT,
 	S_VECTOR_GET_X,
 	S_VECTOR_GET_Y,
 	S_VECTOR_GET_Z,
+	
+	S_FLOOR,
+	S_CEIL,
+	S_ROUND,
+	S_DROUND,
 	
 	S_ASSIGN,
 	S_PRINT,
 	
 	S_FOR,
 	S_ENDFOR,
+	
+	S_DISABLEWORK,
+	S_ENABLEWORK,
 	
 	S_COMPARE,
 	S_MARK,
@@ -100,18 +110,6 @@ enum OperationType {
 	INVALID_OP_TYPE
 };
 
-enum CountRuleType {
-	EQUAL,
-	
-	LESS_THAN,
-	GREATER_THAN,
-	
-	LESS_THAN_OR_EQUAL_TO,
-	GREATER_THAN_OR_EQUAL_TO,
-	
-	INVALID_ARG_COUNT_RULE
-};
-
 typedef std::vector<std::string> ArgList;
 
 typedef std::pair<PreScriptOperation, ArgList> Precommand;
@@ -119,8 +117,9 @@ typedef std::pair<ScriptOperation, ArgList> Command;
 
 class Script {
 private:
-	static std::map<PreScriptOperation, std::pair<int, CountRuleType>> preOpArgCounts;
-	static std::map<ScriptOperation, std::pair<int, CountRuleType>> opArgCounts;
+	static Logger log;
+	static std::map<PreScriptOperation, std::pair<int, int>> preOpArgCounts;
+	static std::map<ScriptOperation, std::pair<int, int>> opArgCounts;
 	static std::map<ScriptOperation, OperationType> opTypes;
 	
 	std::map<std::string, int> labelMarks;

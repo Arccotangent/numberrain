@@ -8,7 +8,7 @@
 
 ## Usage
 
-`VCROSS <vector 1> <vector 2> ... <vector n>;`
+`VCROSS <vector 1> <vector 2> ... [vector n];`
 
 ## Examples
 

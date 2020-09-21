@@ -21,6 +21,8 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #include "../IntegerOperation.h"
 
 class Modulus : public virtual IntegerOperation {
+private:
+	static Logger log;
 public:
 	using IntegerOperation::IntegerOperation;
 	

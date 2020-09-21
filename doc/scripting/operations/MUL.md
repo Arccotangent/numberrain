@@ -9,7 +9,7 @@ From there, the result can be assigned to a variable using `ASSIGN`.
 
 ## Usage
 
-`MUL <real number 1> <real number 2> ... <real number n>;`
+`MUL <real number 1> <real number 2> ... [real number n];`
 
 ## Examples
 

@@ -19,13 +19,15 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+Logger Arccosine::log = Logger("Arccosine");
+
 long Arccosine::eval() {
 	auto start = chrono::system_clock::now();
 	
 	Real adjacent = arguments[0];
 	Real hypotenuse = arguments[1];
-	cout << "Evaluating the arccosine of adjacent leg " << fmt(adjacent) << " and hypotenuse " << fmt(hypotenuse)
-	     << endl;
+	log.i("Evaluating the arccosine of adjacent leg %s and hypotenuse %s", fmt(adjacent).c_str(),
+	      fmt(hypotenuse).c_str());
 	
 	result = boost::multiprecision::acos(adjacent / hypotenuse);
 	
