@@ -27,4 +27,3 @@ The scripting language has limited functionality for the time being.
 ### Known Issues
 
 - Setting precision not far above ~120 digits breaks it, throwing a memory allocation error (at least on my machine)
-- Currently no way to disable work being shown which can easily spam out the console (fix planned soon) 
