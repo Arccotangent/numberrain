@@ -15,9 +15,32 @@ You should have received a copy of the GNU Affero General Public License
 along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NUMBERRAIN_VERSION_H
-#define NUMBERRAIN_VERSION_H
+#ifndef NUMBERRAIN_MATRIX_H
+#define NUMBERRAIN_MATRIX_H
 
-#define VERSION_STR "version 0.1-dev4"
+#include "../Structures.h"
+#include <vector>
 
-#endif //NUMBERRAIN_VERSION_H
+typedef std::vector<std::vector<Real>> RealMatrix;
+typedef std::pair<size_t, size_t> Dimensions;
+
+class Matrix {
+private:
+	RealMatrix matrix;
+	
+	explicit Matrix(const RealMatrix &matrix);
+	
+	static bool verifyDimensions(const RealMatrix &matrix);
+
+public:
+	static Matrix *createMatrix(const RealMatrix &matrix);
+	
+	RealMatrix getMatrix();
+	
+	Dimensions getMatrixDimensions();
+	
+	Real getElementAt(size_t x, size_t y);
+};
+
+
+#endif //NUMBERRAIN_MATRIX_H

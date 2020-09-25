@@ -24,6 +24,23 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 using namespace std;
 
+map<string, ComparisonOperator> ScriptEngine::comparisonOperators = {
+		{"==", EQUAL},
+		{"!=", NOT_EQUAL},
+		{"<=", LESS_THAN_OR_EQUAL_TO},
+		{">=", GREATER_THAN_OR_EQUAL_TO},
+		{"<",  LESS_THAN},
+		{">",  GREATER_THAN}
+};
+
+ComparisonOperator ScriptEngine::getComparisonOperator(const string &oper) {
+	if (comparisonOperators.find(oper) == comparisonOperators.end()) {
+		return INVALID_COMPARISON_OPERATOR;
+	}
+	
+	return comparisonOperators[oper];
+}
+
 bool ScriptEngine::variableExists(const string &varName) {
 	if (boost::algorithm::starts_with(varName, "arg_")) {
 		string tentativeIndex = varName.substr(4);
@@ -54,7 +71,9 @@ string ScriptEngine::getVariableValue(const string &varName) {
 		long argIndex = strtol(tentativeIndex.c_str(), nullptr, 10);
 		
 		if (argIndex < scriptArgs.size() && argIndex >= 0) {
-			return scriptArgs[argIndex];
+			string value = scriptArgs[argIndex];
+			//cout << "[debug] argument at index " << argIndex << " is " << value << endl;
+			return value;
 		}
 	}
 	
@@ -531,6 +550,8 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			}
 			
 			updateVariable(varName, result);
+			
+			//cout << "[debug] updated variable " << varName << " with value " << result << " from result register" << endl;
 			break;
 		}
 		case S_FOR: {
@@ -580,7 +601,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			
 			loopStack.emplace_back(script.getPosition());
 			
-			uint32_t resetPos;
+			int resetPos;
 			
 			while ((loopSpecs[2] > 0 && loopSpecs[0] < loopSpecs[1]) ||
 			       (loopSpecs[2] < 0 && loopSpecs[0] > loopSpecs[1])) {
@@ -615,6 +636,178 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			break;
 		}
 		case S_MARK: {
+			break;
+		}
+		case S_IF: {
+			int initialPos = script.getPosition();
+			int endifPos;
+			
+			int levels = 1;
+			
+			Command command = script.nextCommand();
+			while (levels > 0) {
+				if (!script.isValid()) {
+					cout
+							<< "SCRIPT ERROR: End of IF block not marked by ENDIF - check if there are enough ENDIFs if using nested IF blocks."
+							<< endl;
+					script.invalidate();
+					return;
+				}
+				
+				command = script.nextCommand();
+				
+				if (command.first == S_IF) {
+					levels++;
+					//cout << "[debug] entered nested if - levels = " << levels << endl;
+				} else if (command.first == S_ENDIF) {
+					levels--;
+					//cout << "[debug] exited if - levels = " << levels << endl;
+				}
+			}
+			
+			endifPos = script.getPosition();
+			script.jump(initialPos);
+			
+			ComparisonOperator oper = getComparisonOperator(args[1]);
+			if (oper == INVALID_COMPARISON_OPERATOR) {
+				cout << "SCRIPT ERROR: Invalid comparison operator (catch 1): " << args[1] << endl;
+				script.invalidate();
+				return;
+			}
+			
+			Real a;
+			Real b;
+			
+			if (variableExists(args[0])) {
+				a = Real(getVariableValue(args[0]));
+			} else {
+				a = Real(args[0]);
+			}
+			
+			if (variableExists(args[2])) {
+				b = Real(getVariableValue(args[2]));
+			} else {
+				b = Real(args[2]);
+			}
+			
+			command = script.nextCommand();
+			bool conditionMet = false;
+			
+			while (command.first != S_ENDIF && !conditionMet) {
+				if (!script.isValid()) {
+					cout
+							<< "SCRIPT ERROR: Script invalidated before end of IF block (catch 1) - there are likely other errors - check above."
+							<< endl;
+					script.invalidate();
+					return;
+				}
+				
+				bool goToNextCondition;
+				int condPos = script.getPosition();
+				
+				if (command.first == S_ELSE) {
+					goToNextCondition = false;
+				} else {
+					switch (oper) {
+						case EQUAL: {
+							goToNextCondition = a != b;
+							break;
+						}
+						case NOT_EQUAL: {
+							goToNextCondition = a == b;
+							break;
+						}
+						case LESS_THAN: {
+							goToNextCondition = a >= b;
+							break;
+						}
+						case GREATER_THAN: {
+							goToNextCondition = a <= b;
+							break;
+						}
+						case LESS_THAN_OR_EQUAL_TO: {
+							goToNextCondition = a > b;
+							break;
+						}
+						case GREATER_THAN_OR_EQUAL_TO: {
+							goToNextCondition = a < b;
+							break;
+						}
+						default: {
+							cout << "SCRIPT ERROR: Invalid comparison operator: (catch 2)." << endl;
+							script.invalidate();
+							return;
+						}
+					}
+				}
+				
+				if (goToNextCondition) {
+					command = script.nextCommand();
+					
+					while (command.first != S_ELSEIF && command.first != S_ELSE && command.first != S_ENDIF) {
+						if (!script.isValid()) {
+							cout
+									<< "SCRIPT ERROR: Script invalidated before end of IF block (catch 2) - there are likely other errors - check above."
+									<< endl;
+							script.invalidate();
+							return;
+						}
+						
+						command = script.nextCommand();
+						condPos = script.getPosition() - 1;
+					}
+					
+					if (command.first == S_ELSEIF) {
+						oper = getComparisonOperator(command.second[1]);
+						if (oper == INVALID_COMPARISON_OPERATOR) {
+							cout << "SCRIPT ERROR: Invalid comparison operator: " << command.second[1] << endl;
+							script.invalidate();
+							return;
+						}
+						
+						if (variableExists(command.second[0])) {
+							a = Real(getVariableValue(command.second[0]));
+						} else {
+							a = Real(command.second[0]);
+						}
+						
+						if (variableExists(command.second[2])) {
+							b = Real(getVariableValue(command.second[2]));
+						} else {
+							b = Real(command.second[2]);
+						}
+					}
+					
+					script.jump(condPos);
+					if (endifPos - condPos >= 2) {
+						command = script.nextCommand();
+					}
+					
+					continue;
+				}
+				
+				if (command.first != S_IF && command.first != S_ELSEIF && command.first != S_ELSE) {
+					condPos--;
+				}
+				
+				script.jump(condPos);
+				command = script.nextCommand();
+				conditionMet = true;
+				
+				while (command.first != S_ELSEIF && command.first != S_ELSE && command.first != S_ENDIF &&
+				       script.isValid()) {
+					executeScriptCommand(command);
+					
+					command = script.nextCommand();
+				}
+			}
+			
+			script.jump(endifPos);
+			break;
+		}
+		case S_ELSEIF: {
+			cout << "SCRIPT ERROR: Floating ELSEIF statement." << endl;
+			script.invalidate();
 			break;
 		}
 		case S_JUMP_UNCONDITIONAL: {
@@ -697,8 +890,16 @@ void ScriptEngine::executeVoidOperation(ScriptOperation operation) {
 			break;
 		}
 		case S_ENDFOR: {
-			//should never be executed
+			//should never be executed - mainly for debugging
 			cout << "For loop ended." << endl;
+			break;
+		}
+		case S_ELSE: {
+			cout << "SCRIPT ERROR: Floating ELSE statement." << endl;
+			script.invalidate();
+			break;
+		}
+		case S_ENDIF: {
 			break;
 		}
 		case S_DISABLEWORK: {
@@ -707,6 +908,10 @@ void ScriptEngine::executeVoidOperation(ScriptOperation operation) {
 		}
 		case S_ENABLEWORK: {
 			GlobalVars::getInstance()->setShowWork(true);
+			break;
+		}
+		case S_DIE: {
+			script.invalidate();
 			break;
 		}
 		case END_EXEC: {

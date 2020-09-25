@@ -50,16 +50,16 @@ map<ScriptOperation, pair<int, int>> Script::opArgCounts = {
 		{S_ARCCOSINE,                   {2, 2}},
 		{S_ARCTANGENT,                  {2, 2}},
 		{S_VECTOR_ADD,                  {2, -1}},
-		{S_VECTOR_SUBTRACT,             {2, -1}},
-		{S_VECTOR_SCALAR_MULTIPLY,      {2, 2}},
-		{S_VECTOR_DOT_PRODUCT,          {2, 2}},
-		{S_VECTOR_CROSS_PRODUCT,        {2, -1}},
-		{S_VECTOR_POLAR_TO_RECTANGULAR, {2, 2}},
-		{S_VECTOR_RECTANGULAR_TO_POLAR, {1, 2}},
-		{S_VECTOR_CONSTRUCT,            {1, 3}},
-		{S_VECTOR_GET_X,                {1, 1}},
-		{S_VECTOR_GET_Y,                {1, 1}},
-		{S_VECTOR_GET_Z,                {1, 1}},
+		{S_VECTOR_SUBTRACT,               {2,  -1}},
+		{S_VECTOR_SCALAR_MULTIPLY,        {2,  2}},
+		{S_VECTOR_DOT_PRODUCT,            {2,  2}},
+		{S_VECTOR_CROSS_PRODUCT,          {2,  -1}},
+		{S_VECTOR_POLAR_TO_RECTANGULAR,   {2,  2}},
+		{S_VECTOR_RECTANGULAR_TO_POLAR,   {1,  2}},
+		{S_VECTOR_CONSTRUCT,              {1,  3}},
+		{S_VECTOR_GET_X,                  {1,  1}},
+		{S_VECTOR_GET_Y,                  {1,  1}},
+		{S_VECTOR_GET_Z,                  {1,  1}},
 		{S_PRINT,                         {1,  -1}},
 		{S_ASSIGN,                        {1,  1}},
 		{S_FOR,                           {4,  4}},
@@ -70,6 +70,10 @@ map<ScriptOperation, pair<int, int>> Script::opArgCounts = {
 		{S_DROUND,                        {2,  2}},
 		{S_DISABLEWORK,                   {0,  0}},
 		{S_ENABLEWORK,                    {0,  0}},
+		{S_IF,                            {3,  3}},
+		{S_ELSEIF,                        {3,  3}},
+		{S_ELSE,                          {0,  0}},
+		{S_ENDIF,                         {0,  0}},
 		{S_COMPARE,                       {2,  2}},
 		{S_MARK,                          {1,  1}},
 		{S_JUMP_UNCONDITIONAL,            {1,  1}},
@@ -80,6 +84,7 @@ map<ScriptOperation, pair<int, int>> Script::opArgCounts = {
 		{S_JUMP_GREATER_THAN,             {1,  1}},
 		{S_JUMP_GREATER_THAN_OR_EQUAL_TO, {1,  1}},
 		{S_NOP,                           {1,  1}},
+		{S_DIE,                           {0,  0}},
 		{END_EXEC,                        {0,  0}},
 		{INVALID_OP,                      {-1, -1}}
 };
@@ -107,16 +112,16 @@ map<ScriptOperation, OperationType> Script::opTypes = {
 		{S_ARCCOSINE,                   REAL_SCR},
 		{S_ARCTANGENT,                  REAL_SCR},
 		{S_VECTOR_ADD,                  VECTOR_SCR},
-		{S_VECTOR_SUBTRACT,             VECTOR_SCR},
-		{S_VECTOR_SCALAR_MULTIPLY,      VECTOR_SCR},
-		{S_VECTOR_DOT_PRODUCT,          VECTOR_SCR},
-		{S_VECTOR_CROSS_PRODUCT,        VECTOR_SCR},
-		{S_VECTOR_POLAR_TO_RECTANGULAR, VECTOR_SCR},
-		{S_VECTOR_RECTANGULAR_TO_POLAR, VECTOR_SCR},
-		{S_VECTOR_CONSTRUCT,            REAL_SCR},
-		{S_VECTOR_GET_X,                VECTOR_SCR},
-		{S_VECTOR_GET_Y,                VECTOR_SCR},
-		{S_VECTOR_GET_Z,                VECTOR_SCR},
+		{S_VECTOR_SUBTRACT,               VECTOR_SCR},
+		{S_VECTOR_SCALAR_MULTIPLY,        VECTOR_SCR},
+		{S_VECTOR_DOT_PRODUCT,            VECTOR_SCR},
+		{S_VECTOR_CROSS_PRODUCT,          VECTOR_SCR},
+		{S_VECTOR_POLAR_TO_RECTANGULAR,   VECTOR_SCR},
+		{S_VECTOR_RECTANGULAR_TO_POLAR,   VECTOR_SCR},
+		{S_VECTOR_CONSTRUCT,              REAL_SCR},
+		{S_VECTOR_GET_X,                  VECTOR_SCR},
+		{S_VECTOR_GET_Y,                  VECTOR_SCR},
+		{S_VECTOR_GET_Z,                  VECTOR_SCR},
 		{S_FLOOR,                         REAL_SCR},
 		{S_CEIL,                          REAL_SCR},
 		{S_ROUND,                         REAL_SCR},
@@ -127,6 +132,10 @@ map<ScriptOperation, OperationType> Script::opTypes = {
 		{S_ENDFOR,                        VOID_SCR},
 		{S_DISABLEWORK,                   VOID_SCR},
 		{S_ENABLEWORK,                    VOID_SCR},
+		{S_IF,                            STRING_SCR},
+		{S_ELSEIF,                        STRING_SCR},
+		{S_ELSE,                          VOID_SCR},
+		{S_ENDIF,                         VOID_SCR},
 		{S_COMPARE,                       REAL_SCR},
 		{S_MARK,                          STRING_SCR},
 		{S_JUMP_UNCONDITIONAL,            STRING_SCR},
@@ -137,6 +146,7 @@ map<ScriptOperation, OperationType> Script::opTypes = {
 		{S_JUMP_GREATER_THAN,             STRING_SCR},
 		{S_JUMP_GREATER_THAN_OR_EQUAL_TO, STRING_SCR},
 		{S_NOP,                           STRING_SCR},
+		{S_DIE,                           VOID_SCR},
 		{END_EXEC,                        VOID_SCR},
 		{INVALID_OP,                      INVALID_OP_TYPE}
 };
@@ -277,7 +287,7 @@ bool Script::addCommand(ScriptOperation operation, const ArgList &arguments) {
 }
 
 Command Script::nextCommand() {
-	if (!valid || cursor < 0) {
+	if (!valid || cursor < 0 || cursor >= commands.size()) {
 		return Command(INVALID_OP, ArgList());
 	}
 	
@@ -293,6 +303,11 @@ int Script::getPosition() const {
 	return cursor;
 }
 
-void Script::jump(uint32_t position) {
+void Script::jump(int position) {
+	if (position < 0) {
+		cursor = (int) commands.size() - 1;
+		valid = false;
+	}
+	
 	cursor = position;
 }

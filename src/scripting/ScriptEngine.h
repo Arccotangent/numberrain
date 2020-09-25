@@ -23,8 +23,21 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #include "../logging/Logger.h"
 #include <map>
 
+enum ComparisonOperator {
+	EQUAL,
+	NOT_EQUAL,
+	LESS_THAN_OR_EQUAL_TO,
+	GREATER_THAN_OR_EQUAL_TO,
+	LESS_THAN,
+	GREATER_THAN,
+	
+	INVALID_COMPARISON_OPERATOR
+};
+
 class ScriptEngine : public virtual StringOperation {
 private:
+	static std::map<std::string, ComparisonOperator> comparisonOperators;
+	
 	static Logger log;
 	std::deque<int> loopStack;
 	Script script;
@@ -34,6 +47,8 @@ private:
 	std::vector<std::string> scriptArgs;
 	std::map<std::string, std::string> reservedVariables;
 	std::map<std::string, std::string> variables;
+	
+	static ComparisonOperator getComparisonOperator(const std::string &oper);
 	
 	bool variableExists(const std::string &varName);
 	

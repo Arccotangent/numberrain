@@ -1,0 +1,93 @@
+# example of conditional branching and DIE statement added in 0.1-dev4
+# scripts can also contain tabs for indentation (but not spaces)
+
+!PRECISION 25
+
+BEGIN;
+
+IF argcount < 2;
+	PRINT "please, specify 2 real number arguments";
+	DIE;
+ENDIF;
+
+NOP arg_0;
+ASSIGN a;
+
+NOP arg_1;
+ASSIGN b;
+
+PRINT "arg_0 = " arg_0;
+PRINT "a = " a;
+PRINT "b = " b;
+
+# one shot if block
+IF a == b;
+	PRINT a " equals " b;
+ENDIF;
+
+# if/else
+IF a == b;
+	PRINT a " equals " b;
+ELSE;
+	PRINT a " does not equal " b;
+ENDIF;
+
+# if/else if with no else, all cases covered
+IF a == b;
+	PRINT a " is equal to " b;
+ELSEIF a < b;
+	PRINT a " is less than " b;
+ELSEIF a > b;
+	PRINT a " is greater than " b;
+ENDIF;
+
+# if/else if with no else, not all cases covered
+IF a == b;
+	PRINT a " is equal to " b;
+ELSEIF a == 2;
+	PRINT "a equals 2";
+ELSEIF a > 5;
+	PRINT "a is greater than 5";
+ENDIF;
+
+# longer if/else if with else
+IF a == 1;
+	PRINT "a = 1";
+ELSEIF a == 2;
+	PRINT "a = 2";
+ELSEIF a == 3;
+	PRINT "a = 3";
+ELSEIF a == 4;
+	PRINT "a = 4";
+ELSEIF a == 5;
+	PRINT "a = 5";
+ELSEIF a == 6;
+	PRINT "a = 6";
+ELSEIF a == 7;
+	PRINT "a = 7";
+ELSEIF a == 8;
+	PRINT "a = 8";
+ELSEIF a == 9;
+	PRINT "a = 9";
+ELSEIF a == 10;
+	PRINT "a = 10";
+ELSE;
+	PRINT "a is not between 1 and 10.";
+ENDIF;
+
+PRINT "----------------------------------------------";
+
+# nested if statement
+IF a == 2;
+	PRINT "a = 2";
+
+	IF b == 3;
+		PRINT "a = 2 AND b = 3";
+
+		IF b > 2;
+			PRINT "a = 2 AND b = 3 AND b > 2";
+		ENDIF;
+	ENDIF;
+ENDIF;
+
+END;

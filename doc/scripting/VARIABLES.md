@@ -20,14 +20,22 @@ GCD a b;
 
 If a certain variable does not exist but is still being accessed by a script, the script will crash.
 
+## Scope
+
+Apart from iteration variables in for loops, there is only a global scope. Any variables created will be available for
+the rest of the script, regardless of conditions.
+
+There is currently no way to delete variables.
+
 ## Data Types
 
-The script engine represents all variable values are represented as strings in memory and converts them to the appropriate internal data structure when needed.
+The script engine represents all variable values are represented as strings in memory and converts them to the
+appropriate internal data structure when needed.
 
 The formatting of variables in memory is identical to the format in which data is printed to the console.
 
-Internally, this has the advantage of being able to store all variables in one map.
-However, for computationally expensive scripts, it does add a bit of overhead as variables are parsed every time they are used.
+Internally, this has the advantage of being able to store all variables in one map. However, for computationally
+expensive scripts, it does add a bit of overhead as variables are parsed every time they are used.
 
 ## Current Limitations
 

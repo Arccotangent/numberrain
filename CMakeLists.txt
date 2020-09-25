@@ -45,6 +45,7 @@ set(NUMBERRAIN_SOURCES
         src/vector/VectorCrossProduct.cpp src/vector/VectorCrossProduct.h
         src/vector/VectorPolarToRectangular.cpp src/vector/VectorPolarToRectangular.h
         src/vector/VectorRectangularToPolar.cpp src/vector/VectorRectangularToPolar.h
+        src/matrix/Matrix.cpp src/matrix/Matrix.h
         src/scripting/ScriptEngine.cpp src/scripting/ScriptEngine.h
         src/scripting/Script.cpp src/scripting/Script.h
         src/scripting/ScriptReader.cpp src/scripting/ScriptReader.h)

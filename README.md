@@ -87,10 +87,27 @@ Numberrain currently has the following operations built in:
 - Shows steps taken to arrive at final result wherever appropriate
 - Scripting
 
-Numberrain is decently fast, being written in pure C++ (though it certainly isn't the fastest calculator out there).
-In some cases, it can run over 25,000 operations per second on most modern CPUs.
+### Planned Features
 
-## Bugs
+The following is a list of planned features being considered to be added into Numberrain at some point in the future.
+This list is always subject to change and some ideas may be removed without being implemented. This list is in no
+particular order.
+
+- Matrix operations (soon)
+- Solving quadratic and cubic (maybe quartic or even nth-degree?) equations (somewhat soon)
+- CAS & symbolic operations (not very soon)
+
+## Performance
+
+Numberrain is decently fast, being written in pure C++ (though it certainly isn't the fastest calculator out there). In
+some cases, it can run over 50,000 operations per second on most modern CPUs.
+
+Of course, some operations are more time consuming than others (eg. adding 2 numbers vs vector cross product). The
+performance of scripts is not guaranteed. Some scripts may never terminate on their own, mostly because of a badly
+written script or a bug in Numberrain's script engine.
+
+## Bugs & Contributing
 
 If you find a bug in Numberrain, please open an issue on the tracker.
+
 If you know C++, feel free to open a pull request.

@@ -74,6 +74,10 @@ map<string, ScriptOperation> ScriptReader::opcodes = {
 		{"DISABLEWORK", S_DISABLEWORK},
 		{"ENABLEWORK",  S_ENABLEWORK},
 		
+		{"IF",          S_IF},
+		{"ELSEIF",      S_ELSEIF},
+		{"ELSE",        S_ELSE},
+		{"ENDIF",       S_ENDIF},
 		{"CMP",         S_COMPARE},
 		{"MARK",        S_MARK},
 		{"JMP",         S_JUMP_UNCONDITIONAL},
@@ -85,6 +89,8 @@ map<string, ScriptOperation> ScriptReader::opcodes = {
 		{"JGE",         S_JUMP_GREATER_THAN_OR_EQUAL_TO},
 		
 		{"NOP",         S_NOP},
+		
+		{"DIE",         S_DIE},
 		
 		{"END",         END_EXEC}
 };
@@ -193,6 +199,9 @@ Script ScriptReader::readScript() {
 		char nextChar = scriptData[cursor];
 		
 		cursor++;
+		
+		if (nextChar == '\t') //ignore tabs for indentation
+			continue;
 		
 		if (comment && nextChar != '\n')
 			continue;

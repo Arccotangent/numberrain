@@ -84,6 +84,10 @@ enum ScriptOperation {
 	S_DISABLEWORK,
 	S_ENABLEWORK,
 	
+	S_IF,
+	S_ELSEIF,
+	S_ELSE,
+	S_ENDIF,
 	S_COMPARE,
 	S_MARK,
 	S_JUMP_UNCONDITIONAL,
@@ -95,6 +99,8 @@ enum ScriptOperation {
 	S_JUMP_GREATER_THAN_OR_EQUAL_TO,
 	
 	S_NOP,
+	
+	S_DIE,
 	
 	END_EXEC,
 	
@@ -162,7 +168,7 @@ public:
 	
 	[[nodiscard]] int getPosition() const;
 	
-	void jump(uint32_t position);
+	void jump(int position);
 };
 
 
