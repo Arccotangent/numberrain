@@ -1014,7 +1014,7 @@ void ScriptEngine::initializeConstants() {
 			{"e",            fmt(boost::math::constants::e<Real>())},
 			{"golden_ratio", fmt(boost::math::constants::phi<Real>())},
 			{"euler_gamma",  fmt(boost::math::constants::euler<Real>())},
-			{"argcount",     to_string(arguments.size())}
+			{"argcount",     to_string(arguments.size() - 1)}
 	};
 }
 
