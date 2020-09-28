@@ -7,20 +7,19 @@ The scripting language has limited functionality for the time being.
 ## Features
 
 - Turing-complete
-	- Looping and conditional branching and jumps
+	- Looping and conditional branching
 - Accept an arbitrary number of command line arguments
 - Access to (almost) every function of Numberrain CLI
 	- Basically an API to Numberrain math engine
 - Some useful tools and utilities exclusive to scripts
+- Functions
 
 ## Limitations
 
-- No (built-in) function functionality (yet)
-	- However, it is possible to implement "pseudo-functions" using jumps and the `NOP` and `MARK` operations for the
-	  time being
 - No import functionality (yet)
 - Scripts can be indented, but only with tabs due to technical restrictions (at least for now)
 	- Indenting with spaces will cause errors
+	- It is unlikely that indenting with spaces will be supported any time soon
 
 ## Technical Specifications
 

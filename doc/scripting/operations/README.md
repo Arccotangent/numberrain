@@ -63,9 +63,8 @@ The following is a list of operations supported by the scripting engine.
 ### Miscellaneous (scripting exclusive)
 
 - `BEGIN` and `END` (Begin and end a script)
-- Jumping operations `JMP`, `JEQ`, `JNE`, `JLE`, `JLT`, `JGE`, `JGT` (Jump to a label specified by `MARK`)
-- `MARK` (Define a label for jumping)
 - `FOR` and `ENDFOR` (For loops)
-- `CMP` (Compare two real numbers)
 - `DISABLEWORK` (Disable showing work)
 - `ENABLEWORK` (Enable showing work)
+- `IF`, `ELSEIF`, `ELSE`, `ENDIF` (Conditional execution)
+- `FUNCTION`, `RETURN`, `ENDFUNC`, `CALL` (Functions)

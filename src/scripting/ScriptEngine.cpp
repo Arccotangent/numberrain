@@ -41,6 +41,85 @@ ComparisonOperator ScriptEngine::getComparisonOperator(const string &oper) {
 	return comparisonOperators[oper];
 }
 
+bool ScriptEngine::isValidType(const string &value, DataType type) {
+	switch (type) {
+		case DT_VOID: {
+			return true;
+		}
+		case DT_REAL: {
+			try {
+				auto val = Real(value);
+				return true;
+			} catch (exception &e) {
+				return false;
+			}
+		}
+		case DT_INTEGER: {
+			try {
+				auto val = Integer(value);
+				return true;
+			} catch (exception &e) {
+				return false;
+			}
+		}
+		case DT_VECTOR: {
+			try {
+				vector<string> parts;
+				
+				if (boost::algorithm::contains(value, "i")) {
+					vector<string> parts2;
+					boost::algorithm::split_regex(parts2, value, boost::regex("\\s"));
+					
+					bool negative = false;
+					
+					stringstream ss1;
+					for (int i = 0; i < parts2.size(); i++) {
+						if (!boost::regex_search(parts2[i], boost::regex("[0-9]+"))) {
+							negative = parts2[i].find('-') != string::npos;
+							continue;
+						}
+						
+						if (negative)
+							ss1 << "-";
+						ss1 << parts2[i];
+						if (i < parts2.size() - 1)
+							ss1 << ",";
+					}
+					
+					string newArg = ss1.str();
+					string charsToRemove = "ijk ";
+					
+					newArg.erase(remove_if(newArg.begin(), newArg.end(), [charsToRemove](char ch) {
+						return charsToRemove.find(ch) != string::npos;
+					}), newArg.end());
+					
+					boost::algorithm::split(parts, newArg, boost::algorithm::is_any_of(","));
+				} else {
+					boost::algorithm::split(parts, value, boost::algorithm::is_any_of(","));
+				}
+				
+				Real x = Real(parts[0]);
+				Real y = parts.size() >= 2 ? Real(parts[1]) : 0.0;
+				Real z = parts.size() >= 3 ? Real(parts[2]) : 0.0;
+				return true;
+			} catch (exception &e) {
+				return false;
+			}
+		}
+		case DT_STRING: {
+			return true;
+		}
+		default: {
+			return false;
+		}
+	}
+}
+
+bool ScriptEngine::isReservedVariable(const string &varName) {
+	return reservedVariables.find(varName) != reservedVariables.end() || varName == "result" ||
+	       boost::algorithm::starts_with(varName, "arg_");
+}
+
 bool ScriptEngine::variableExists(const string &varName) {
 	if (boost::algorithm::starts_with(varName, "arg_")) {
 		string tentativeIndex = varName.substr(4);
@@ -56,11 +135,14 @@ bool ScriptEngine::variableExists(const string &varName) {
 		}
 	}
 	
-	return varName == "argcount" || variables.find(varName) != variables.end() ||
+	return varName == "result" || variables.find(varName) != variables.end() ||
 	       reservedVariables.find(varName) != reservedVariables.end();
 }
 
 string ScriptEngine::getVariableValue(const string &varName) {
+	if (varName == "result")
+		return result;
+	
 	if (boost::algorithm::starts_with(varName, "arg_")) {
 		string tentativeIndex = varName.substr(4);
 		
@@ -77,9 +159,6 @@ string ScriptEngine::getVariableValue(const string &varName) {
 		}
 	}
 	
-	if (varName == "argcount")
-		return to_string(scriptArgs.size());
-	
 	if (!variableExists(varName)) {
 		return "";
 	}
@@ -92,11 +171,7 @@ string ScriptEngine::getVariableValue(const string &varName) {
 }
 
 bool ScriptEngine::updateVariable(const string &varName, const string &value) {
-	if (boost::algorithm::starts_with(varName, "arg_")) {
-		return false;
-	}
-	
-	if (reservedVariables.find(varName) != reservedVariables.end()) {
+	if (isReservedVariable(varName)) {
 		return false;
 	}
 	
@@ -104,18 +179,6 @@ bool ScriptEngine::updateVariable(const string &varName, const string &value) {
 	variables.emplace(varName, value);
 	
 	return true;
-}
-
-void ScriptEngine::jumpToLabel(const string &labelName) {
-	if (!script.markExists(labelName)) {
-		cout << "SCRIPT ERROR: Label '" << labelName << "' does not exist." << endl;
-		script.invalidate();
-		return;
-	}
-	
-	int labelPos = script.getMarkPosition(labelName);
-	
-	script.jump(labelPos);
 }
 
 void ScriptEngine::executeScriptCommand(const Command &command) {
@@ -394,19 +457,6 @@ void ScriptEngine::executeRealOperation(ScriptOperation operation, const vector<
 			result = fmt(rounded);
 			break;
 		}
-		case S_COMPARE: {
-			Real a = args[0];
-			Real b = args[1];
-			
-			if (a == b)
-				compRegister = 0;
-			else if (a < b)
-				compRegister = -1;
-			else
-				compRegister = 1;
-			
-			break;
-		}
 		default: {
 			cout
 					<< "SCRIPT ERROR: attempted to execute operation with real numbers, yet it accepts something else (this is a bug, please report it!)"
@@ -543,8 +593,20 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			string varName = args[0];
 			boost::regex digits("^[0-9]");
 			
+			if (isReservedVariable(varName)) {
+				cout << "SCRIPT ERROR: variable name '" << varName << "' is a reserved variable" << endl;
+				script.invalidate();
+				return;
+			}
+			
 			if (boost::regex_match(varName, digits)) {
-				cout << "SCRIPT ERROR: variable names cannot start with a number." << endl;
+				cout << "SCRIPT ERROR: variable names cannot start with a number" << endl;
+				script.invalidate();
+				return;
+			}
+			
+			if (boost::contains(varName, ":")) {
+				cout << "SCRIPT ERROR: variable names cannot contain colons" << endl;
 				script.invalidate();
 				return;
 			}
@@ -559,7 +621,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			vector<Integer> loopSpecs; //0 = loopVarValue, 1 = loopEndValue, 2 = loopStep
 			
 			if (reservedVariables.find(loopVarName) != reservedVariables.end()) {
-				cout << "SCRIPT ERROR: FOR loop attempted to redefine a reserved variable ('" << loopVarName << "')."
+				cout << "SCRIPT ERROR: FOR loop attempted to redefine a reserved variable ('" << loopVarName << "')"
 				     << endl;
 				script.invalidate();
 				return;
@@ -572,24 +634,6 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 					loopSpecs.emplace_back(args[i]);
 				}
 			}
-			
-			/*if (loopSpecs[2] == 0) {
-				cout << "SCRIPT ERROR: For loop will never end (step is zero)." << endl;
-				script.invalidate();
-				return;
-			}
-			
-			if (loopSpecs[0] < loopSpecs[1] && loopSpecs[2] < 0) {
-				cout << "SCRIPT ERROR: For loop will never end (start < end, step is negative)." << endl;
-				script.invalidate();
-				return;
-			}
-			
-			if (loopSpecs[0] > loopSpecs[1] && loopSpecs[2] > 0) {
-				cout << "SCRIPT ERROR: For loop will never end (start > end, step is positive)." << endl;
-				script.invalidate();
-				return;
-			}*/
 			
 			bool loopVarPreExisting = variables.find(loopVarName) != variables.end();
 			string loopVarPreValue;
@@ -606,7 +650,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			while ((loopSpecs[2] > 0 && loopSpecs[0] < loopSpecs[1]) ||
 			       (loopSpecs[2] < 0 && loopSpecs[0] > loopSpecs[1])) {
 				if (!script.isValid()) {
-					cout << "SCRIPT ERROR: End of FOR loop iteration code not marked by ENDFOR." << endl;
+					cout << "SCRIPT ERROR: end of FOR loop iteration code not marked by ENDFOR" << endl;
 					script.invalidate();
 					return;
 				}
@@ -635,9 +679,6 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			}
 			break;
 		}
-		case S_MARK: {
-			break;
-		}
 		case S_IF: {
 			int initialPos = script.getPosition();
 			int endifPos;
@@ -648,7 +689,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			while (levels > 0) {
 				if (!script.isValid()) {
 					cout
-							<< "SCRIPT ERROR: End of IF block not marked by ENDIF - check if there are enough ENDIFs if using nested IF blocks."
+							<< "SCRIPT ERROR: end of IF block not marked by ENDIF - check if there are enough ENDIFs if using nested IF blocks"
 							<< endl;
 					script.invalidate();
 					return;
@@ -670,7 +711,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			
 			ComparisonOperator oper = getComparisonOperator(args[1]);
 			if (oper == INVALID_COMPARISON_OPERATOR) {
-				cout << "SCRIPT ERROR: Invalid comparison operator (catch 1): " << args[1] << endl;
+				cout << "SCRIPT ERROR: invalid comparison operator (catch 1): " << args[1] << endl;
 				script.invalidate();
 				return;
 			}
@@ -696,7 +737,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			while (command.first != S_ENDIF && !conditionMet) {
 				if (!script.isValid()) {
 					cout
-							<< "SCRIPT ERROR: Script invalidated before end of IF block (catch 1) - there are likely other errors - check above."
+							<< "SCRIPT ERROR: script invalidated before end of IF block (catch 1) - there are likely other errors - check above"
 							<< endl;
 					script.invalidate();
 					return;
@@ -734,7 +775,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 							break;
 						}
 						default: {
-							cout << "SCRIPT ERROR: Invalid comparison operator: (catch 2)." << endl;
+							cout << "SCRIPT ERROR: invalid comparison operator (catch 2)" << endl;
 							script.invalidate();
 							return;
 						}
@@ -747,7 +788,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 					while (command.first != S_ELSEIF && command.first != S_ELSE && command.first != S_ENDIF) {
 						if (!script.isValid()) {
 							cout
-									<< "SCRIPT ERROR: Script invalidated before end of IF block (catch 2) - there are likely other errors - check above."
+									<< "SCRIPT ERROR: script invalidated before end of IF block (catch 2) - there are likely other errors - check above"
 									<< endl;
 							script.invalidate();
 							return;
@@ -760,7 +801,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 					if (command.first == S_ELSEIF) {
 						oper = getComparisonOperator(command.second[1]);
 						if (oper == INVALID_COMPARISON_OPERATOR) {
-							cout << "SCRIPT ERROR: Invalid comparison operator: " << command.second[1] << endl;
+							cout << "SCRIPT ERROR: invalid comparison operator: " << command.second[1] << endl;
 							script.invalidate();
 							return;
 						}
@@ -806,67 +847,99 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			break;
 		}
 		case S_ELSEIF: {
-			cout << "SCRIPT ERROR: Floating ELSEIF statement." << endl;
+			cout << "SCRIPT ERROR: floating ELSEIF statement" << endl;
 			script.invalidate();
 			break;
 		}
-		case S_JUMP_UNCONDITIONAL: {
-			string label = args[0];
-			jumpToLabel(label);
+		case S_FUNCTION: {
+			script.jump(script.getFunction(args[1]).endPosition);
 			break;
 		}
-		case S_JUMP_EQUAL: {
-			if (compRegister != 0) {
+		case S_CALL: {
+			string functionName = args[0];
+			if (!script.functionExists(functionName)) {
+				cout << "SCRIPT ERROR: function '" << functionName << "' is undefined" << endl;
+				script.invalidate();
 				break;
 			}
 			
-			string label = args[0];
-			jumpToLabel(label);
-			break;
-		}
-		case S_JUMP_NOT_EQUAL: {
-			if (compRegister == 0) {
+			int origPos = script.getPosition();
+			Function func = script.getFunction(functionName);
+			
+			if (func.startPosition < 0) {
+				cout << "SCRIPT ERROR: invalid function " << functionName << endl;
+				script.invalidate();
 				break;
 			}
 			
-			string label = args[0];
-			jumpToLabel(label);
-			break;
-		}
-		case S_JUMP_LESS_THAN: {
-			if (compRegister != -1) {
+			if (args.size() - 1 != func.args.size()) {
+				cout << "SCRIPT ERROR: wrong number of arguments passed to function " << functionName << " - expected "
+				     << func.args.size() << ", received " << args.size() - 1 << endl;
+				script.invalidate();
 				break;
 			}
 			
-			string label = args[0];
-			jumpToLabel(label);
-			break;
-		}
-		case S_JUMP_LESS_THAN_OR_EQUAL_TO: {
-			if (compRegister == 1) {
-				break;
+			map<string, string> variableBackup;
+			
+			for (int i = 1; i < args.size(); i++) {
+				pair<string, DataType> arg = func.args[i - 1];
+				
+				if (isReservedVariable(arg.first)) {
+					cout << "SCRIPT ERROR: argument '" << arg.first << "' attempts to overwrite a reserved variable"
+					     << endl;
+					script.invalidate();
+					return;
+				}
+				
+				if (!isValidType(args[i], arg.second)) {
+					cout << "SCRIPT ERROR: argument " << i - 1 << " passed to function " << functionName
+					     << " is the wrong data type" << endl;
+					script.invalidate();
+					return;
+				}
+				
+				if (variableExists(arg.first)) {
+					variableBackup.emplace(arg.first, getVariableValue(arg.first));
+				}
+				
+				updateVariable(arg.first, args[i]);
 			}
 			
-			string label = args[0];
-			jumpToLabel(label);
-			break;
-		}
-		case S_JUMP_GREATER_THAN: {
-			if (compRegister != 1) {
-				break;
+			script.jump(func.startPosition + 1);
+			Command cmd = script.nextCommand();
+			
+			while (cmd.first != S_ENDFUNC) {
+				if (cmd.first == S_RETURN) {
+					if (func.returnType == DT_VOID) {
+						break;
+					} else {
+						if (variableExists(cmd.second[0])) {
+							result = getVariableValue(cmd.second[0]);
+						} else {
+							result = cmd.second[0];
+						}
+					}
+					
+					if (!isValidType(result, func.returnType)) {
+						cout << "SCRIPT ERROR: function '" << functionName << "' returned the incorrect data type"
+						     << endl;
+					}
+					break;
+				}
+				
+				executeScriptCommand(cmd);
+				cmd = script.nextCommand();
 			}
 			
-			string label = args[0];
-			jumpToLabel(label);
-			break;
-		}
-		case S_JUMP_GREATER_THAN_OR_EQUAL_TO: {
-			if (compRegister == -1) {
-				break;
+			for (const auto &var : func.args) {
+				if (variableBackup.find(var.first) != variableBackup.end()) {
+					updateVariable(var.first, variableBackup[var.first]);
+				} else {
+					variables.erase(var.first);
+				}
 			}
 			
-			string label = args[0];
-			jumpToLabel(label);
+			script.jump(origPos);
 			break;
 		}
 		case S_NOP: {
@@ -910,6 +983,13 @@ void ScriptEngine::executeVoidOperation(ScriptOperation operation) {
 			GlobalVars::getInstance()->setShowWork(true);
 			break;
 		}
+		case S_RESCHECK: {
+			result = result.empty() ? "0" : "1";
+			break;
+		}
+		case S_ENDFUNC: {
+			break;
+		}
 		case S_DIE: {
 			script.invalidate();
 			break;
@@ -933,7 +1013,8 @@ void ScriptEngine::initializeConstants() {
 			{"pi",           fmt(boost::math::constants::pi<Real>())},
 			{"e",            fmt(boost::math::constants::e<Real>())},
 			{"golden_ratio", fmt(boost::math::constants::phi<Real>())},
-			{"euler_gamma",  fmt(boost::math::constants::euler<Real>())}
+			{"euler_gamma",  fmt(boost::math::constants::euler<Real>())},
+			{"argcount",     to_string(arguments.size())}
 	};
 }
 

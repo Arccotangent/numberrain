@@ -1,0 +1,50 @@
+# with functions, recursion is much easier
+# even things like the ackermann function are made practical
+
+!PRECISION 10
+
+BEGIN;
+
+DISABLEWORK; # not really helpful, just slows it down
+
+IF argcount < 2;
+	PRINT "ackermann <m> <n>";
+	DIE;
+ENDIF;
+
+IF arg_0 < 0;
+	PRINT "invalid value for m - it must be non-negative.";
+	DIE;
+ENDIF;
+
+IF arg_1 < 0;
+	PRINT "invalid value for n - it must be non-negative.";
+	DIE;
+ENDIF;
+
+FUNCTION INT ack m:INT n:INT;
+	IF m == 0;
+		ADD n 1;
+	ELSEIF n == 0;
+		SUB m 1;
+		CALL ack result 1;
+	ELSE;
+		SUB n 1;
+		CALL ack m result;
+
+		ASSIGN ack1; # "that vile second argument" -prof. brailsford
+		SUB m 1;
+
+		CALL ack result ack1;
+	ENDIF;
+
+	RETURN result;
+ENDFUNC;
+
+PRINT "evaluating ack(" arg_0 ", " arg_1 ") now...";
+
+CALL ack arg_0 arg_1;
+
+PRINT "ack(" arg_0 ", " arg_1 ") = " result;
+
+END;

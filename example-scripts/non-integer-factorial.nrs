@@ -8,8 +8,10 @@ BEGIN;
 
 DISABLEWORK;
 
-CMP argcount 1;
-JLT argerr;
+IF argcount < 1;
+	PRINT "non-integer-factorial <number>";
+	DIE;
+ENDIF;
 
 # customize
 
@@ -25,69 +27,58 @@ NOP 1;
 ASSIGN res;
 
 FOR k 1 terms 1;
+	DIV 1 k;
+	ASSIGN recipK;
 
-DIV 1 k;
-ASSIGN recipK;
+	DIV arg k;
+	ASSIGN arg/k; # valid variable name
 
-DIV arg k;
-ASSIGN arg/k; # valid variable name
+	ADD 1 recipK;
+	ASSIGN numerBase;
 
-ADD 1 recipK;
-ASSIGN numerBase;
+	EXP numerBase arg;
+	ASSIGN numer;
 
-EXP numerBase arg;
-ASSIGN numer;
+	ADD 1 arg/k;
+	ASSIGN denom;
 
-ADD 1 arg/k;
-ASSIGN denom;
+	DIV numer denom;
+	ASSIGN term;
 
-DIV numer denom;
-ASSIGN term;
+	MUL res term;
+	ASSIGN res;
 
-MUL res term;
-ASSIGN res;
-
-PRINT "finished term " k;
-
+	PRINT "finished term " k;
 ENDFOR;
 
 ROUND arg;
 ASSIGN argInt;
 
-CMP arg argInt;
-JEQ int;
+IF arg == argInt;
+	FCT argInt;
+    ASSIGN realFactorial;
 
-PRINT "";
-PRINT "factorial of " arg " is approximately " res;
-PRINT "";
-JMP end;
+    SUB realFactorial res;
+    ASSIGN errorNumer;
 
-MARK int;
-FCT argInt;
-ASSIGN realFactorial;
+    ABS errorNumer;
+    ASSIGN errorNumer;
 
-SUB realFactorial res;
-ASSIGN errorNumer;
+    DIV errorNumer realFactorial;
+    ASSIGN error;
 
-ABS errorNumer;
-ASSIGN errorNumer;
+    MUL error 100;
+    ASSIGN error;
 
-DIV errorNumer realFactorial;
-ASSIGN error;
-
-MUL error 100;
-ASSIGN error;
-
-PRINT "";
-PRINT "factorial of " arg " is approximately " res;
-PRINT "real factorial of " arg " is " realFactorial;
-PRINT "the percent error is" error " percent";
-PRINT "";
-JMP end;
-
-MARK argerr;
-PRINT "non-integer-factorial <number>";
-
-MARK end;
+    PRINT "";
+    PRINT "factorial of " arg " is approximately " res;
+    PRINT "real factorial of " arg " is " realFactorial;
+    PRINT "the percent error is" error " percent";
+    PRINT "";
+ELSE;
+	PRINT "";
+    PRINT "factorial of " arg " is approximately " res;
+    PRINT "";
+ENDIF;
 
 END;

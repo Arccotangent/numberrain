@@ -54,39 +54,35 @@ map<ScriptOperation, pair<int, int>> Script::opArgCounts = {
 		{S_VECTOR_SCALAR_MULTIPLY,        {2,  2}},
 		{S_VECTOR_DOT_PRODUCT,            {2,  2}},
 		{S_VECTOR_CROSS_PRODUCT,          {2,  -1}},
-		{S_VECTOR_POLAR_TO_RECTANGULAR,   {2,  2}},
-		{S_VECTOR_RECTANGULAR_TO_POLAR,   {1,  2}},
-		{S_VECTOR_CONSTRUCT,              {1,  3}},
-		{S_VECTOR_GET_X,                  {1,  1}},
-		{S_VECTOR_GET_Y,                  {1,  1}},
-		{S_VECTOR_GET_Z,                  {1,  1}},
-		{S_PRINT,                         {1,  -1}},
-		{S_ASSIGN,                        {1,  1}},
-		{S_FOR,                           {4,  4}},
-		{S_ENDFOR,                        {0,  0}},
-		{S_FLOOR,                         {1,  1}},
-		{S_CEIL,                          {1,  1}},
-		{S_ROUND,                         {1,  1}},
-		{S_DROUND,                        {2,  2}},
-		{S_DISABLEWORK,                   {0,  0}},
-		{S_ENABLEWORK,                    {0,  0}},
-		{S_IF,                            {3,  3}},
-		{S_ELSEIF,                        {3,  3}},
-		{S_ELSE,                          {0,  0}},
-		{S_ENDIF,                         {0,  0}},
-		{S_COMPARE,                       {2,  2}},
-		{S_MARK,                          {1,  1}},
-		{S_JUMP_UNCONDITIONAL,            {1,  1}},
-		{S_JUMP_EQUAL,                    {1,  1}},
-		{S_JUMP_NOT_EQUAL,                {1,  1}},
-		{S_JUMP_LESS_THAN,                {1,  1}},
-		{S_JUMP_LESS_THAN_OR_EQUAL_TO,    {1,  1}},
-		{S_JUMP_GREATER_THAN,             {1,  1}},
-		{S_JUMP_GREATER_THAN_OR_EQUAL_TO, {1,  1}},
-		{S_NOP,                           {1,  1}},
-		{S_DIE,                           {0,  0}},
-		{END_EXEC,                        {0,  0}},
-		{INVALID_OP,                      {-1, -1}}
+		{S_VECTOR_POLAR_TO_RECTANGULAR, {2,  2}},
+		{S_VECTOR_RECTANGULAR_TO_POLAR, {1,  2}},
+		{S_VECTOR_CONSTRUCT,            {1,  3}},
+		{S_VECTOR_GET_X,                {1,  1}},
+		{S_VECTOR_GET_Y,                {1,  1}},
+		{S_VECTOR_GET_Z,                {1,  1}},
+		{S_PRINT,                       {1,  -1}},
+		{S_ASSIGN,                      {1,  1}},
+		{S_FOR,                         {4,  4}},
+		{S_ENDFOR,                      {0,  0}},
+		{S_FLOOR,                       {1,  1}},
+		{S_CEIL,                        {1,  1}},
+		{S_ROUND,                       {1,  1}},
+		{S_DROUND,                      {2,  2}},
+		{S_DISABLEWORK,                 {0,  0}},
+		{S_ENABLEWORK,                  {0,  0}},
+		{S_IF,                          {3,  3}},
+		{S_ELSEIF,                      {3,  3}},
+		{S_ELSE,                        {0,  0}},
+		{S_ENDIF,                       {0,  0}},
+		{S_FUNCTION,                    {2,  -1}},
+		{S_RETURN,                      {1,  1}},
+		{S_ENDFUNC,                     {0,  0}},
+		{S_CALL,                        {1,  -1}},
+		{S_NOP,                         {1,  1}},
+		{S_DIE,                         {0,  0}},
+		{S_RESCHECK,                    {0,  0}},
+		{END_EXEC,                      {0,  0}},
+		{INVALID_OP,                    {-1, -1}}
 };
 
 map<ScriptOperation, OperationType> Script::opTypes = {
@@ -116,39 +112,43 @@ map<ScriptOperation, OperationType> Script::opTypes = {
 		{S_VECTOR_SCALAR_MULTIPLY,        VECTOR_SCR},
 		{S_VECTOR_DOT_PRODUCT,            VECTOR_SCR},
 		{S_VECTOR_CROSS_PRODUCT,          VECTOR_SCR},
-		{S_VECTOR_POLAR_TO_RECTANGULAR,   VECTOR_SCR},
-		{S_VECTOR_RECTANGULAR_TO_POLAR,   VECTOR_SCR},
-		{S_VECTOR_CONSTRUCT,              REAL_SCR},
-		{S_VECTOR_GET_X,                  VECTOR_SCR},
-		{S_VECTOR_GET_Y,                  VECTOR_SCR},
-		{S_VECTOR_GET_Z,                  VECTOR_SCR},
-		{S_FLOOR,                         REAL_SCR},
-		{S_CEIL,                          REAL_SCR},
-		{S_ROUND,                         REAL_SCR},
-		{S_DROUND,                        REAL_SCR},
-		{S_PRINT,                         STRING_SCR},
-		{S_ASSIGN,                        STRING_SCR},
-		{S_FOR,                           STRING_SCR},
-		{S_ENDFOR,                        VOID_SCR},
-		{S_DISABLEWORK,                   VOID_SCR},
-		{S_ENABLEWORK,                    VOID_SCR},
-		{S_IF,                            STRING_SCR},
-		{S_ELSEIF,                        STRING_SCR},
-		{S_ELSE,                          VOID_SCR},
-		{S_ENDIF,                         VOID_SCR},
-		{S_COMPARE,                       REAL_SCR},
-		{S_MARK,                          STRING_SCR},
-		{S_JUMP_UNCONDITIONAL,            STRING_SCR},
-		{S_JUMP_EQUAL,                    STRING_SCR},
-		{S_JUMP_NOT_EQUAL,                STRING_SCR},
-		{S_JUMP_LESS_THAN,                STRING_SCR},
-		{S_JUMP_LESS_THAN_OR_EQUAL_TO,    STRING_SCR},
-		{S_JUMP_GREATER_THAN,             STRING_SCR},
-		{S_JUMP_GREATER_THAN_OR_EQUAL_TO, STRING_SCR},
-		{S_NOP,                           STRING_SCR},
-		{S_DIE,                           VOID_SCR},
-		{END_EXEC,                        VOID_SCR},
-		{INVALID_OP,                      INVALID_OP_TYPE}
+		{S_VECTOR_POLAR_TO_RECTANGULAR, VECTOR_SCR},
+		{S_VECTOR_RECTANGULAR_TO_POLAR, VECTOR_SCR},
+		{S_VECTOR_CONSTRUCT,            REAL_SCR},
+		{S_VECTOR_GET_X,                VECTOR_SCR},
+		{S_VECTOR_GET_Y,                VECTOR_SCR},
+		{S_VECTOR_GET_Z,                VECTOR_SCR},
+		{S_FLOOR,                       REAL_SCR},
+		{S_CEIL,                        REAL_SCR},
+		{S_ROUND,                       REAL_SCR},
+		{S_DROUND,                      REAL_SCR},
+		{S_PRINT,                       STRING_SCR},
+		{S_ASSIGN,                      STRING_SCR},
+		{S_FOR,                         STRING_SCR},
+		{S_ENDFOR,                      VOID_SCR},
+		{S_DISABLEWORK,                 VOID_SCR},
+		{S_ENABLEWORK,                  VOID_SCR},
+		{S_IF,                          STRING_SCR},
+		{S_ELSEIF,                      STRING_SCR},
+		{S_ELSE,                        VOID_SCR},
+		{S_ENDIF,                       VOID_SCR},
+		{S_FUNCTION,                    STRING_SCR},
+		{S_RETURN,                      STRING_SCR},
+		{S_ENDFUNC,                     VOID_SCR},
+		{S_CALL,                        STRING_SCR},
+		{S_NOP,                         STRING_SCR},
+		{S_RESCHECK,                    VOID_SCR},
+		{S_DIE,                         VOID_SCR},
+		{END_EXEC,                      VOID_SCR},
+		{INVALID_OP,                    INVALID_OP_TYPE}
+};
+
+map<string, DataType> Script::dataTypeCodes = {
+		{"VOID",   DT_VOID},
+		{"REAL",   DT_REAL},
+		{"INT",    DT_INTEGER},
+		{"VECTOR", DT_VECTOR},
+		{"STRING", DT_STRING}
 };
 
 OperationType Script::getOpType(ScriptOperation operation) {
@@ -157,6 +157,14 @@ OperationType Script::getOpType(ScriptOperation operation) {
 	}
 	
 	return opTypes[operation];
+}
+
+DataType Script::getDataType(const string &code) {
+	if (dataTypeCodes.find(code) == dataTypeCodes.end()) {
+		return INVALID_DATA_TYPE;
+	}
+	
+	return dataTypeCodes[code];
 }
 
 bool Script::checkPreOpArgCount(PreScriptOperation operation, uint32_t argCount) {
@@ -197,6 +205,10 @@ bool Script::checkOpArgCount(ScriptOperation operation, uint32_t argCount) {
 
 void Script::lockRO() {
 	writable = false;
+	if (functionInsertionMode) {
+		cout << "ERROR: Function '" << activeFunction << "' is never terminated by ENDFUNC" << endl;
+		invalidate();
+	}
 }
 
 void Script::invalidate() {
@@ -207,16 +219,19 @@ bool Script::isValid() const {
 	return valid;
 }
 
-bool Script::markExists(const string &name) {
-	return labelMarks.find(name) != labelMarks.end();
+bool Script::functionExists(const string &name) {
+	return functions.find(name) != functions.end();
 }
 
-int Script::getMarkPosition(const string &name) {
-	if (!markExists(name)) {
-		return (int) commands.size() - 1;
+Function Script::getFunction(const string &name) {
+	if (!functionExists(name)) {
+		Function invalid;
+		invalid.startPosition = -1;
+		
+		return invalid;
 	}
 	
-	return labelMarks[name];
+	return functions[name];
 }
 
 void Script::executePreCommands() {
@@ -276,9 +291,78 @@ bool Script::addCommand(ScriptOperation operation, const ArgList &arguments) {
 		return false;
 	}
 	
-	if (operation == S_MARK) {
-		labelMarks.emplace(arguments[0], commands.size());
-		return true;
+	switch (operation) {
+		case S_FUNCTION: {
+			if (functionInsertionMode) {
+				cout << "Nested functions are not supported" << endl;
+				return false;
+			}
+			
+			string retCode = arguments[0];
+			string name = arguments[1];
+			
+			if (functionExists(name)) {
+				cout << "Multiple definition of function " << name << endl;
+				return false;
+			}
+			
+			DataType retType = getDataType(retCode);
+			if (retType == INVALID_DATA_TYPE) {
+				cout << "Invalid return type '" << retCode << "' for function " << name << endl;
+				return false;
+			}
+			
+			Function func;
+			func.startPosition = commands.size();
+			func.returnType = retType;
+			
+			for (int i = 2; i < arguments.size(); i++) {
+				vector<string> parts;
+				string arg = arguments[i];
+				
+				boost::algorithm::split(parts, arg, boost::algorithm::is_any_of(":"));
+				
+				if (parts.size() != 2) {
+					cout << "Invalid argument specification '" << arg << "' for function " << name << endl;
+					return false;
+				}
+				
+				string argName = parts[0];
+				
+				if (func.argExists(argName)) {
+					cout << "Multiple definition of argument '" << argName << "' in function " << name << endl;
+					return false;
+				}
+				
+				DataType argType = getDataType(parts[1]);
+				
+				if (argType == INVALID_DATA_TYPE) {
+					cout << "Invalid data type for argument '" << argName << "' in function " << name << endl;
+					return false;
+				}
+				
+				func.args.emplace_back(pair<string, DataType>(argName, argType));
+			}
+			
+			functions.emplace(name, func);
+			functionInsertionMode = true;
+			activeFunction = name;
+			break;
+		}
+		case S_ENDFUNC: {
+			if (!functionInsertionMode) {
+				cout << "Floating ENDFUNC statement" << endl;
+				return false;
+			}
+			
+			functions[activeFunction].endPosition = commands.size();
+			functionInsertionMode = false;
+			activeFunction = "";
+			break;
+		}
+		default: {
+			break;
+		}
 	}
 	
 	commands.emplace_back(operation, arguments);

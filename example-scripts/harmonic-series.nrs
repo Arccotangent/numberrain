@@ -6,8 +6,10 @@ BEGIN;
 
 DISABLEWORK;
 
-CMP argcount 0;
-JEQ noArgs;
+IF argcount == 0;
+	PRINT "no arguments passed";
+	DIE;
+ENDIF;
 
 # customize
 
@@ -18,23 +20,15 @@ NOP 0;
 ASSIGN sum;
 
 FOR k 1 terms 1;
+	DIV 1 k;
+	ASSIGN term;
 
-DIV 1 k;
-ASSIGN term;
-
-ADD term sum;
-ASSIGN sum;
-
+	ADD term sum;
+	ASSIGN sum;
 ENDFOR;
 
 PRINT "";
 PRINT "sum of first " arg_0 " terms of the harmonic series is " sum;
 PRINT "";
-JMP end;
-
-MARK noArgs;
-PRINT "no arguments passed";
-
-MARK end;
 
 END;

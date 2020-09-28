@@ -1,0 +1,29 @@
+# demonstration of functions added in Numberrain 0.1-dev5
+# as well as direct access to the result register
+# implementation of the pythagorean theorem as a function
+
+!PRECISION 25
+
+BEGIN;
+
+FUNCTION REAL pythag leg1:REAL leg2:REAL;
+	EXP leg1 2; # square first leg
+	ASSIGN leg1squared;
+
+	EXP leg2 2; # square second leg
+	ASSIGN leg2squared;
+
+	ADD leg1squared leg2squared; # add squares
+	ASSIGN hypotSquared;
+
+	SQRT hypotSquared; # calculate the sum's square root
+	ASSIGN hypot;
+
+	RETURN hypot; # hypotenuse length
+ENDFUNC;
+
+CALL pythag 3 4;
+
+PRINT "pythag(3, 4) = " result;
+
+END;

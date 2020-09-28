@@ -4,24 +4,17 @@
 
 BEGIN;
 
-CMP argcount 0;
-JEQ noArgs;
+IF argcount == 0;
+	PRINT "you entered no arguments";
+	DIE;
+ENDIF;
 
 PRINT "you entered " argcount " arguments on the command line";
 PRINT "printing them now";
 PRINT "";
 
 FOR i 0 argcount 1;
-
-PRINT "argument " i " is " arg_i; # argument indices can be variables
-
+	PRINT "argument " i " is " arg_i; # argument indices can be variables
 ENDFOR;
-
-JMP end;
-
-MARK noArgs;
-PRINT "you entered no arguments";
-
-MARK end;
 
 END;

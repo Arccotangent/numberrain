@@ -42,21 +42,21 @@ private:
 	std::deque<int> loopStack;
 	Script script;
 	
-	int compRegister = 0; //0 = equal, -1 = less than, 1 = greater than
-	
 	std::vector<std::string> scriptArgs;
 	std::map<std::string, std::string> reservedVariables;
 	std::map<std::string, std::string> variables;
 	
 	static ComparisonOperator getComparisonOperator(const std::string &oper);
 	
+	bool isValidType(const std::string &value, DataType type);
+	
+	bool isReservedVariable(const std::string &varName);
+	
 	bool variableExists(const std::string &varName);
 	
 	std::string getVariableValue(const std::string &varName);
 	
 	bool updateVariable(const std::string &varName, const std::string &value);
-	
-	void jumpToLabel(const std::string &labelName);
 	
 	void executeScriptCommand(const Command &command);
 	

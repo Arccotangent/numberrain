@@ -78,17 +78,14 @@ map<string, ScriptOperation> ScriptReader::opcodes = {
 		{"ELSEIF",      S_ELSEIF},
 		{"ELSE",        S_ELSE},
 		{"ENDIF",       S_ENDIF},
-		{"CMP",         S_COMPARE},
-		{"MARK",        S_MARK},
-		{"JMP",         S_JUMP_UNCONDITIONAL},
-		{"JEQ",         S_JUMP_EQUAL},
-		{"JNE",         S_JUMP_NOT_EQUAL},
-		{"JLT",         S_JUMP_LESS_THAN},
-		{"JLE",         S_JUMP_LESS_THAN_OR_EQUAL_TO},
-		{"JGT",         S_JUMP_GREATER_THAN},
-		{"JGE",         S_JUMP_GREATER_THAN_OR_EQUAL_TO},
+		
+		{"FUNCTION",    S_FUNCTION},
+		{"RETURN",      S_RETURN},
+		{"ENDFUNC",     S_ENDFUNC},
+		{"CALL",        S_CALL},
 		
 		{"NOP",         S_NOP},
+		{"RESCHECK",    S_RESCHECK},
 		
 		{"DIE",         S_DIE},
 		

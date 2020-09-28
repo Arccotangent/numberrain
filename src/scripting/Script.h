@@ -22,6 +22,7 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #include <deque>
 #include <vector>
 #include <string>
+#include <boost/algorithm/string.hpp>
 #include "../Structures.h"
 #include "../logging/Logger.h"
 
@@ -88,17 +89,14 @@ enum ScriptOperation {
 	S_ELSEIF,
 	S_ELSE,
 	S_ENDIF,
-	S_COMPARE,
-	S_MARK,
-	S_JUMP_UNCONDITIONAL,
-	S_JUMP_EQUAL,
-	S_JUMP_NOT_EQUAL,
-	S_JUMP_LESS_THAN,
-	S_JUMP_LESS_THAN_OR_EQUAL_TO,
-	S_JUMP_GREATER_THAN,
-	S_JUMP_GREATER_THAN_OR_EQUAL_TO,
+	
+	S_FUNCTION,
+	S_RETURN,
+	S_ENDFUNC,
+	S_CALL,
 	
 	S_NOP,
+	S_RESCHECK,
 	
 	S_DIE,
 	
@@ -117,10 +115,33 @@ enum OperationType {
 	INVALID_OP_TYPE
 };
 
+enum DataType {
+	DT_VOID,
+	DT_REAL,
+	DT_INTEGER,
+	DT_VECTOR,
+	DT_STRING,
+	
+	INVALID_DATA_TYPE
+};
+
 typedef std::vector<std::string> ArgList;
 
 typedef std::pair<PreScriptOperation, ArgList> Precommand;
 typedef std::pair<ScriptOperation, ArgList> Command;
+
+struct Function {
+	int startPosition;
+	int endPosition;
+	std::vector<std::pair<std::string, DataType>> args;
+	DataType returnType;
+	
+	bool argExists(const std::string &name) {
+		return std::any_of(args.begin(), args.end(), [&](std::pair<std::string, DataType> &arg) {
+			return arg.first == name;
+		});
+	}
+};
 
 class Script {
 private:
@@ -128,8 +149,11 @@ private:
 	static std::map<PreScriptOperation, std::pair<int, int>> preOpArgCounts;
 	static std::map<ScriptOperation, std::pair<int, int>> opArgCounts;
 	static std::map<ScriptOperation, OperationType> opTypes;
+	static std::map<std::string, DataType> dataTypeCodes;
 	
-	std::map<std::string, int> labelMarks;
+	bool functionInsertionMode = false;
+	std::string activeFunction;
+	std::map<std::string, Function> functions;
 	
 	std::deque<Precommand> preCommands;
 	std::deque<Command> commands;
@@ -148,15 +172,17 @@ public:
 	
 	static OperationType getOpType(ScriptOperation op);
 	
+	static DataType getDataType(const std::string &code);
+	
 	void lockRO();
 	
 	void invalidate();
 	
 	[[nodiscard]] bool isValid() const;
 	
-	bool markExists(const std::string &name);
+	bool functionExists(const std::string &name);
 	
-	int getMarkPosition(const std::string &name);
+	Function getFunction(const std::string &name);
 	
 	void executePreCommands();
 	

@@ -4,8 +4,8 @@ Numberrain scripts support basic variables.
 
 ## Usage
 
-All variables are assigned their values by means of an `ASSIGN` statement.
-There is no `=` operator like in most programming and scripting languages.
+All variables are assigned their values by means of an `ASSIGN` statement. There is currently no `=` operator like in
+most programming and scripting languages.
 
 `ASSIGN var;` - Copies the value in the result register into a variable named `var`.
 
@@ -26,6 +26,14 @@ Apart from iteration variables in for loops, there is only a global scope. Any v
 the rest of the script, regardless of conditions.
 
 There is currently no way to delete variables.
+
+## Variable Names
+
+Variables can have any name provided that the name meets these criteria:
+
+- Does not start with a number
+- Does not contain a colon
+- Does not match a reserved variable name (see [RESERVED-VARIABLES.md](RESERVED-VARIABLES.md))
 
 ## Data Types
 
