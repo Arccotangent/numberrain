@@ -15,9 +15,28 @@ You should have received a copy of the GNU Affero General Public License
 along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NUMBERRAIN_VERSION_H
-#define NUMBERRAIN_VERSION_H
+#ifndef NUMBERRAIN_MATRIXOPERATION_H
+#define NUMBERRAIN_MATRIXOPERATION_H
 
-#define VERSION_STR "version 0.1-dev7"
+#include <vector>
+#include <chrono>
+#include <iostream>
+#include "logging/Logger.h"
+#include "Structures.h"
+#include "matrix/Matrix.h"
 
-#endif //NUMBERRAIN_VERSION_H
+class MatrixOperation {
+protected:
+	std::vector<Matrix> arguments;
+	Matrix result;
+
+public:
+	explicit MatrixOperation(const std::vector<Matrix> &arguments);
+	
+	virtual long eval() = 0;
+	
+	[[nodiscard]] Matrix getResult() const;
+};
+
+
+#endif //NUMBERRAIN_MATRIXOPERATION_H

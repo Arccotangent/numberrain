@@ -48,12 +48,12 @@ map<string, ScriptOperation> ScriptReader::opcodes = {
 		{"ARCTAN", S_ARCTANGENT},
 		
 		{"VADD",   S_VECTOR_ADD},
-		{"VSUB",   S_VECTOR_SUBTRACT},
-		{"VSMUL",  S_VECTOR_SCALAR_MULTIPLY},
-		{"VDOT",   S_VECTOR_DOT_PRODUCT},
-		{"VCROSS", S_VECTOR_CROSS_PRODUCT},
-		{"VPTR",   S_VECTOR_POLAR_TO_RECTANGULAR},
-		{"VRTP",   S_VECTOR_RECTANGULAR_TO_POLAR},
+		{"VSUB",        S_VECTOR_SUBTRACT},
+		{"VSMUL",       S_VECTOR_SCALAR_MULTIPLY},
+		{"VDOT",        S_VECTOR_DOT_PRODUCT},
+		{"VCROSS",      S_VECTOR_CROSS_PRODUCT},
+		{"VPTR",        S_VECTOR_POLAR_TO_RECTANGULAR},
+		{"VRTP",        S_VECTOR_RECTANGULAR_TO_POLAR},
 		
 		{"VC",          S_VECTOR_CONSTRUCT},
 		{"VX",          S_VECTOR_GET_X},
@@ -68,9 +68,14 @@ map<string, ScriptOperation> ScriptReader::opcodes = {
 		{"ASSIGN",      S_ASSIGN},
 		{"PRINT",       S_PRINT},
 		
+		{"BREAK",       S_BREAK},
 		{"FOR",         S_FOR},
 		{"ENDFOR",      S_ENDFOR},
+		{"WHILE",       S_WHILE},
+		{"ENDWHILE",    S_ENDWHILE},
 		
+		{"MUTE",        S_MUTE},
+		{"UNMUTE",      S_UNMUTE},
 		{"DISABLEWORK", S_DISABLEWORK},
 		{"ENABLEWORK",  S_ENABLEWORK},
 		

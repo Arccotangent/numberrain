@@ -55,6 +55,9 @@ void Logger::w(const char *msg, ...) {
 }
 
 void Logger::i(const char *msg, ...) {
+	if (!GlobalVars::getInstance()->shouldLogToConsole())
+		return;
+	
 	va_list args;
 	va_start(args, msg);
 	
@@ -75,7 +78,7 @@ void Logger::d(const char *msg, ...) {
 }
 
 void Logger::r(const char *msg, ...) {
-	if (!GlobalVars::getInstance()->shouldShowWork())
+	if (!GlobalVars::getInstance()->shouldShowWork() || !GlobalVars::getInstance()->shouldLogToConsole())
 		return;
 	
 	va_list args;

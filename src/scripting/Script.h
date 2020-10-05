@@ -79,9 +79,14 @@ enum ScriptOperation {
 	S_ASSIGN,
 	S_PRINT,
 	
+	S_BREAK,
 	S_FOR,
 	S_ENDFOR,
+	S_WHILE,
+	S_ENDWHILE,
 	
+	S_MUTE,
+	S_UNMUTE,
 	S_DISABLEWORK,
 	S_ENABLEWORK,
 	
@@ -110,6 +115,7 @@ enum OperationType {
 	REAL_SCR,
 	INTEGER_SCR,
 	VECTOR_SCR,
+	//MATRIX_SCR,
 	STRING_SCR,
 	
 	INVALID_OP_TYPE
@@ -120,6 +126,7 @@ enum DataType {
 	DT_REAL,
 	DT_INTEGER,
 	DT_VECTOR,
+	//DT_MATRIX,
 	DT_STRING,
 	
 	INVALID_DATA_TYPE

@@ -75,10 +75,20 @@ void printUsage() {
 			<< "\tvrtp <vector> - Find the polar coordinates of a vector given its rectangular coordinates (only x and y used) (angle is in degrees counterclockwise of +x axis)"
 			<< endl;
 	cout << endl;
+	cout << "-----Matrix Operations-----" << endl;
+	cout
+			<< "NOTICE: Matrix multiplication can take more than 2 matrices, but you must make sure that the inputs are compatible with previous products."
+			<< endl;
+	cout << "Matrix multiplication is done from left to right." << endl;
+	cout << endl;
+	cout << "\tmadd <2+ matrices> - Add matrices" << endl;
+	cout << "\tmsub <2+ matrices> - Subtract matrices" << endl;
+	cout << "\tmmul <2+ matrices> - Multiply matrices" << endl;
+	cout << "\tmdet <matrix> - Calculate the determinant of any square matrix" << endl;
+	cout << endl;
 	cout << "-----Scripting-----" << endl;
 	cout << "NOTE: The conventional Numberrain script extension is .nrs" << endl;
 	cout << "NOTE: Mathematical constants are available in scripts, but not in command line at the time." << endl;
-	cout << "NOTE: Scripts cannot accept command line arguments at the time." << endl;
 	cout << endl;
 	cout << "\texec <file> - Execute a Numberrain script" << endl;
 	cout << endl;
@@ -95,6 +105,21 @@ void printUsage() {
 	cout
 			<< "So entering 'numberrain vsmul 2,3,1 1,1,1' is exactly the same as 'numberrain vsmul 2 1,1,1' since y and z are ignored."
 			<< endl;
+	cout << endl;
+	cout << "How to enter matrices:" << endl;
+	cout
+			<< "Matrices are entered in rows separated by slashes, with individual elements separated by commas in each row."
+			<< endl;
+	cout << "Examples:" << endl;
+	cout << "\tA 3x2 matrix like the below would be entered as 1,2,3/4,5,6" << endl;
+	cout << "\t\t[ 1 2 3 ]" << endl;
+	cout << "\t\t[ 4 5 6 ]" << endl;
+	cout << "\tA 4x1 matrix like the below would be entered as 1/2/3/4" << endl;
+	cout << "\t\t[ 1 ]" << endl;
+	cout << "\t\t[ 2 ]" << endl;
+	cout << "\t\t[ 3 ]" << endl;
+	cout << "\t\t[ 4 ]" << endl;
+	cout << "Matrix elements are real numbers like those of vectors, they can be decimals as well." << endl;
 }
 
 string getHomeDirectory() {
@@ -294,6 +319,68 @@ int main(int argc, char *argv[]) {
 			cout << "===================================================================================" << endl;
 			cout << "Time: " << time << " microseconds" << endl;
 			cout << "Final result: " << fmt(result) << endl;
+			break;
+		}
+		case MATRIX: {
+			vector<Matrix> arguments;
+			
+			cout << "Arguments (matrices): {" << endl;
+			
+			for (int i = 2; i < argc; i++) {
+				RealMatrix matrixRaw;
+				
+				vector<string> rowStrings;
+				boost::algorithm::split(rowStrings, argv[i], boost::algorithm::is_any_of("/"));
+				
+				for (const auto &rowStr : rowStrings) {
+					if (rowStr == "," || rowStr.empty())
+						continue;
+					
+					vector<string> columnStrings;
+					boost::algorithm::split(columnStrings, rowStr, boost::algorithm::is_any_of(","));
+					
+					vector<Real> row;
+					for (const auto &columnStr : columnStrings) {
+						row.emplace_back(Real(columnStr));
+					}
+					
+					matrixRaw.emplace_back(row);
+				}
+				
+				Matrix *matrix = Matrix::createMatrix(matrixRaw, matrixRaw.size() == 1 && matrixRaw[0].size() == 1);
+				if (matrix == nullptr) {
+					cout << "ERROR: Invalid matrix dimensions for matrix: " << argv[i] << endl;
+					return 1;
+				}
+				
+				cout << fmt(*matrix) << endl;
+				arguments.emplace_back(*matrix);
+			}
+			
+			cout << "}" << endl;
+			
+			if (!dispatcher.checkArgCount(arguments.size())) {
+				cout << "Invalid argument count! Run Numberrain without any arguments to see usage." << endl;
+				return 1;
+			}
+			
+			MatrixOperation *oper = dispatcher.getMatrixOperation(arguments);
+			
+			if (oper == nullptr) {
+				cout
+						<< "Invalid operation! Run Numberrain without any arguments to see usage. (This is also a bug, please report it!)"
+						<< endl;
+				return 1;
+			}
+			
+			cout << "===================================================================================" << endl;
+			long time = oper->eval();
+			
+			Matrix result = oper->getResult();
+			
+			cout << "===================================================================================" << endl;
+			cout << "Time: " << time << " microseconds" << endl;
+			cout << "Final result: " << endl << fmt(result) << endl;
 			break;
 		}
 		case STRING: {

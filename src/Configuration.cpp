@@ -33,6 +33,7 @@ void Configuration::createIfNotExist() {
 	property_tree::ptree defaults;
 	
 	defaults.put("precision", 50);
+	defaults.put("logToConsole", true);
 	defaults.put("showWork", true);
 	
 	property_tree::write_json(file, defaults);
@@ -44,6 +45,10 @@ void Configuration::load() {
 
 int Configuration::getPrecision() {
 	return props.get<int>("precision");
+}
+
+bool Configuration::shouldLogToConsole() {
+	return props.get<bool>("logToConsole");
 }
 
 bool Configuration::shouldShowWork() {

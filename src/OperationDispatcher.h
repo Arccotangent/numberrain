@@ -23,6 +23,7 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #include "RealOperation.h"
 #include "IntegerOperation.h"
 #include "VectorOperation.h"
+#include "MatrixOperation.h"
 #include "StringOperation.h"
 #include "Structures.h"
 
@@ -57,6 +58,11 @@ enum Oper {
 	VECTOR_POLAR_TO_RECTANGULAR,
 	VECTOR_RECTANGULAR_TO_POLAR,
 	
+	MATRIX_ADDITION,
+	MATRIX_SUBTRACTION,
+	MATRIX_MULTIPLICATION,
+	MATRIX_DETERMINANT,
+	
 	EXECUTE_SCRIPT,
 	
 	INVALID_OPER
@@ -66,6 +72,7 @@ enum ArgType {
 	REAL,
 	INTEGER,
 	VECTOR,
+	MATRIX,
 	STRING,
 	
 	INVALID_ARG_TYPE
@@ -93,6 +100,8 @@ public:
 	IntegerOperation *getIntegerOperation(const std::vector<Integer> &arguments);
 	
 	VectorOperation *getVectorOperation(const std::vector<Vector> &arguments);
+	
+	MatrixOperation *getMatrixOperation(const std::vector<Matrix> &arguments);
 	
 	StringOperation *getStringOperation(const std::vector<std::string> &arguments);
 };

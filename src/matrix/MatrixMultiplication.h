@@ -15,9 +15,19 @@ You should have received a copy of the GNU Affero General Public License
 along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NUMBERRAIN_VERSION_H
-#define NUMBERRAIN_VERSION_H
+#ifndef NUMBERRAIN_MATRIXMULTIPLICATION_H
+#define NUMBERRAIN_MATRIXMULTIPLICATION_H
 
-#define VERSION_STR "version 0.1-dev7"
+#include "../MatrixOperation.h"
 
-#endif //NUMBERRAIN_VERSION_H
+class MatrixMultiplication : public virtual MatrixOperation {
+private:
+	static Logger log;
+public:
+	using MatrixOperation::MatrixOperation;
+	
+	long eval() override;
+};
+
+
+#endif //NUMBERRAIN_MATRIXMULTIPLICATION_H

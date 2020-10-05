@@ -15,9 +15,14 @@ You should have received a copy of the GNU Affero General Public License
 along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NUMBERRAIN_VERSION_H
-#define NUMBERRAIN_VERSION_H
+#include "MatrixOperation.h"
 
-#define VERSION_STR "version 0.1-dev7"
+using namespace std;
 
-#endif //NUMBERRAIN_VERSION_H
+MatrixOperation::MatrixOperation(const vector<Matrix> &arguments) {
+	this->arguments = arguments;
+}
+
+Matrix MatrixOperation::getResult() const {
+	return result;
+}

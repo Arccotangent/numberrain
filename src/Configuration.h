@@ -36,6 +36,8 @@ public:
 	
 	int getPrecision();
 	
+	bool shouldLogToConsole();
+	
 	bool shouldShowWork();
 };
 

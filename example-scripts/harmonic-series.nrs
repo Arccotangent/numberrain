@@ -19,12 +19,16 @@ ASSIGN terms;
 NOP 0;
 ASSIGN sum;
 
+MUTE;
+
 FOR k 1 terms 1;
 	DIV 1 k;
 	ASSIGN term;
 
 	ADD term sum;
 	ASSIGN sum;
+
+	PRINT "after " k " terms, sum is " sum;
 ENDFOR;
 
 PRINT "";

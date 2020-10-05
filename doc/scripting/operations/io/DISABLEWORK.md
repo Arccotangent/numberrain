@@ -1,6 +1,6 @@
 # DISABLEWORK
 
-`DISABLEWORK` is a special operation.
+`DISABLEWORK` is an I/O operation.
 
 ## Description
 

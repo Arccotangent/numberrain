@@ -40,14 +40,18 @@ map<string, Oper> OperationDispatcher::opcodes = {
 		{"arcsin", ARCSINE},
 		{"arccos", ARCCOSINE},
 		{"arctan", ARCTANGENT},
-		{"vadd",   VECTOR_ADDITION},
-		{"vsub",   VECTOR_SUBTRACTION},
-		{"vsmul",  VECTOR_SCALAR_MULTIPLICATION},
-		{"vdot",   VECTOR_DOT_PRODUCT},
+		{"vadd", VECTOR_ADDITION},
+		{"vsub", VECTOR_SUBTRACTION},
+		{"vsmul", VECTOR_SCALAR_MULTIPLICATION},
+		{"vdot", VECTOR_DOT_PRODUCT},
 		{"vcross", VECTOR_CROSS_PRODUCT},
-		{"vptr",   VECTOR_POLAR_TO_RECTANGULAR},
-		{"vrtp",   VECTOR_RECTANGULAR_TO_POLAR},
-		{"exec",   EXECUTE_SCRIPT}
+		{"vptr", VECTOR_POLAR_TO_RECTANGULAR},
+		{"vrtp", VECTOR_RECTANGULAR_TO_POLAR},
+		{"madd", MATRIX_ADDITION},
+		{"msub", MATRIX_SUBTRACTION},
+		{"mmul", MATRIX_MULTIPLICATION},
+		{"mdet", MATRIX_DETERMINANT},
+		{"exec", EXECUTE_SCRIPT}
 };
 
 OperationDispatcher::OperationDispatcher(const string &operation) {
@@ -81,6 +85,9 @@ bool OperationDispatcher::checkArgCount(size_t argCount) {
 		case VECTOR_ADDITION:
 		case VECTOR_SUBTRACTION:
 		case VECTOR_CROSS_PRODUCT:
+		case MATRIX_ADDITION:
+		case MATRIX_SUBTRACTION:
+		case MATRIX_MULTIPLICATION:
 			return argCount >= 2;
 		case SQUARE_ROOT:
 		case FACTORIAL:
@@ -90,6 +97,7 @@ bool OperationDispatcher::checkArgCount(size_t argCount) {
 		case COSINE:
 		case TANGENT:
 		case VECTOR_RECTANGULAR_TO_POLAR:
+		case MATRIX_DETERMINANT:
 			return argCount == 1;
 		case CUSTOM_BASE_LOGARITHM:
 		case ARCSINE:
@@ -139,6 +147,11 @@ ArgType OperationDispatcher::getArgType() {
 		case VECTOR_POLAR_TO_RECTANGULAR:
 		case VECTOR_RECTANGULAR_TO_POLAR:
 			return VECTOR;
+		case MATRIX_ADDITION:
+		case MATRIX_SUBTRACTION:
+		case MATRIX_MULTIPLICATION:
+		case MATRIX_DETERMINANT:
+			return MATRIX;
 		case EXECUTE_SCRIPT:
 			return STRING;
 		default:
@@ -220,6 +233,23 @@ VectorOperation *OperationDispatcher::getVectorOperation(const vector<Vector> &a
 			return new VectorPolarToRectangular(arguments);
 		case VECTOR_RECTANGULAR_TO_POLAR:
 			return new VectorRectangularToPolar(arguments);
+		default:
+			return nullptr;
+	}
+}
+
+MatrixOperation *OperationDispatcher::getMatrixOperation(const vector<Matrix> &arguments) {
+	Oper oper = convert(operation);
+	
+	switch (oper) {
+		case MATRIX_ADDITION:
+			return new MatrixAddition(arguments);
+		case MATRIX_SUBTRACTION:
+			return new MatrixSubtraction(arguments);
+		case MATRIX_MULTIPLICATION:
+			return new MatrixMultiplication(arguments);
+		case MATRIX_DETERMINANT:
+			return new MatrixDeterminant(arguments);
 		default:
 			return nullptr;
 	}

@@ -14,9 +14,7 @@ FUNCTION REAL pythag leg1:REAL leg2:REAL;
 	ASSIGN leg2squared;
 
 	ADD leg1squared leg2squared; # add squares
-	ASSIGN hypotSquared;
-
-	SQRT hypotSquared; # calculate the sum's square root
+	SQRT result; # take the square root to determine the length of the hypotenuse
 	ASSIGN hypot;
 
 	RETURN hypot; # hypotenuse length

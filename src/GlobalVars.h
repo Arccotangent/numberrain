@@ -22,6 +22,7 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 class GlobalVars {
 private:
+	bool logToConsole = true;
 	bool showWork = true;
 	
 	GlobalVars() = default;
@@ -29,7 +30,11 @@ private:
 public:
 	static GlobalVars *getInstance();
 	
-	void setShowWork(bool showWork);
+	void setLogToConsole(bool value);
+	
+	bool shouldLogToConsole();
+	
+	void setShowWork(bool value);
 	
 	bool shouldShowWork();
 };

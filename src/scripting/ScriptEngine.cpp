@@ -279,8 +279,11 @@ void ScriptEngine::executeScriptCommand(const Command &command) {
 			vector<string> arguments;
 			
 			for (auto &argStr : args) {
+				//some special cases:
+				//ASSIGN is a special case because interpreting variables would make reassignment impossible
+				//WHILE is a special case because we don't want the variable to be interpreted - it should be changing on each iteration
 				if (variableExists(argStr) && command.first !=
-				                              S_ASSIGN) { //ASSIGN is a special case here, substituting variables would make reassignment impossible
+				                              S_ASSIGN && command.first != S_WHILE) {
 					if ((argStr[0] == '"') != (argStr[argStr.length() - 1] == '"')) {
 						cout << "RUNTIME ERROR (PRINT): Unterminated quotes in word" << endl;
 					} else if (argStr[0] == '"' && argStr[argStr.length() - 1] == '"') {
@@ -605,8 +608,8 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 				return;
 			}
 			
-			if (boost::contains(varName, ":")) {
-				cout << "SCRIPT ERROR: variable names cannot contain colons" << endl;
+			if (boost::contains(varName, "/")) {
+				cout << "SCRIPT ERROR: variable names cannot contain slashes" << endl;
 				script.invalidate();
 				return;
 			}
@@ -627,6 +630,33 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 				return;
 			}
 			
+			int initialPos = script.getPosition();
+			int levels = 1;
+			
+			Command command = script.nextCommand();
+			while (levels > 0) {
+				if (!script.isValid()) {
+					cout
+							<< "SCRIPT ERROR: end of FOR loop not marked by ENDFOR - check if there are enough ENDFORs if using nested FOR loops"
+							<< endl;
+					script.invalidate();
+					return;
+				}
+				
+				command = script.nextCommand();
+				
+				if (command.first == S_FOR) {
+					levels++;
+					//cout << "[debug] entered nested for - levels = " << levels << endl;
+				} else if (command.first == S_ENDFOR) {
+					levels--;
+					//cout << "[debug] exited for - levels = " << levels << endl;
+				}
+			}
+			
+			loopEndStack.emplace_front(script.getPosition());
+			script.jump(initialPos);
+			
 			for (int i = 1; i < 4; i++) {
 				if (variableExists(args[i])) {
 					loopSpecs.emplace_back(Integer(getVariableValue(args[i])));
@@ -641,42 +671,175 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 				loopVarPreValue = variables[loopVarName];
 			}
 			
-			Command buf;
-			
-			loopStack.emplace_back(script.getPosition());
-			
-			int resetPos;
-			
 			while ((loopSpecs[2] > 0 && loopSpecs[0] < loopSpecs[1]) ||
-			       (loopSpecs[2] < 0 && loopSpecs[0] > loopSpecs[1])) {
+			       (loopSpecs[2] < 0 && loopSpecs[0] > loopSpecs[1]) ||
+			       loopSpecs[2] == 0) {
 				if (!script.isValid()) {
-					cout << "SCRIPT ERROR: end of FOR loop iteration code not marked by ENDFOR" << endl;
+					cout
+							<< "SCRIPT ERROR: script invalidated before end of FOR loop (catch 1) - there are likely other errors - check above"
+							<< endl;
 					script.invalidate();
 					return;
 				}
 				
 				updateVariable(loopVarName, fmt(loopSpecs[0]));
 				
-				Command command = script.nextCommand();
+				command = script.nextCommand();
 				
 				if (command.first == S_ENDFOR) {
-					resetPos = script.getPosition();
 					loopSpecs[0] += loopSpecs[2];
-					script.jump(loopStack.back());
+					script.jump(initialPos);
 					continue;
 				}
 				
 				executeScriptCommand(command);
+				
+				if (ignore)
+					break;
 			}
-			
-			loopStack.pop_back();
-			script.jump(resetPos);
 			
 			variables.erase(loopVarName);
 			
 			if (loopVarPreExisting) {
 				variables[loopVarName] = loopVarPreValue;
 			}
+			
+			if (ignore)
+				break;
+			
+			script.jump(loopEndStack.front());
+			loopEndStack.pop_front();
+			break;
+		}
+		case S_WHILE: {
+			int initialPos = script.getPosition();
+			int levels = 1;
+			
+			Command command = script.nextCommand();
+			while (levels > 0) {
+				if (!script.isValid()) {
+					cout
+							<< "SCRIPT ERROR: end of WHILE loop not marked by ENDWHILE - check if there are enough ENDWHILEs if using nested WHILE loops"
+							<< endl;
+					script.invalidate();
+					return;
+				}
+				
+				command = script.nextCommand();
+				
+				if (command.first == S_WHILE) {
+					levels++;
+					//cout << "[debug] entered nested while - levels = " << levels << endl;
+				} else if (command.first == S_ENDWHILE) {
+					levels--;
+					//cout << "[debug] exited while - levels = " << levels << endl;
+				}
+			}
+			
+			loopEndStack.emplace_front(script.getPosition());
+			script.jump(initialPos);
+			
+			ComparisonOperator oper = getComparisonOperator(args[1]);
+			if (oper == INVALID_COMPARISON_OPERATOR) {
+				cout << "SCRIPT ERROR: invalid comparison operator (while, catch 1): " << args[1] << endl;
+				script.invalidate();
+				return;
+			}
+			
+			bool keepGoing = true;
+			command = script.nextCommand();
+			
+			Real a;
+			Real b;
+			
+			while (keepGoing) {
+				if (!script.isValid()) {
+					cout
+							<< "SCRIPT ERROR: script invalidated before end of WHILE loop (catch 1) - there are likely other errors - check above"
+							<< endl;
+					script.invalidate();
+					return;
+				}
+				
+				if (variableExists(args[0])) {
+					a = Real(getVariableValue(args[0]));
+				} else {
+					a = Real(args[0]);
+				}
+				
+				if (variableExists(args[2])) {
+					b = Real(getVariableValue(args[2]));
+				} else {
+					b = Real(args[2]);
+				}
+				
+				//cout << "[debug] a = " << fmt(a) << endl;
+				//cout << "[debug] b = " << fmt(b) << endl;
+				
+				switch (oper) {
+					case EQUAL: {
+						keepGoing = a == b;
+						break;
+					}
+					case NOT_EQUAL: {
+						keepGoing = a != b;
+						break;
+					}
+					case LESS_THAN: {
+						keepGoing = a < b;
+						break;
+					}
+					case GREATER_THAN: {
+						keepGoing = a > b;
+						break;
+					}
+					case LESS_THAN_OR_EQUAL_TO: {
+						keepGoing = a <= b;
+						break;
+					}
+					case GREATER_THAN_OR_EQUAL_TO: {
+						keepGoing = a >= b;
+						break;
+					}
+					default: {
+						cout << "SCRIPT ERROR: invalid comparison operator (while, catch 2)" << endl;
+						script.invalidate();
+						return;
+					}
+				}
+				
+				if (ignore)
+					break;
+				
+				while (command.first != S_ENDWHILE) {
+					if (!script.isValid()) {
+						cout
+								<< "SCRIPT ERROR: script invalidated before end of WHILE loop (catch 2) - there are likely other errors - check above"
+								<< endl;
+						script.invalidate();
+						return;
+					}
+					
+					executeScriptCommand(command);
+					
+					if (ignore)
+						break;
+					
+					command = script.nextCommand();
+				}
+				
+				if (ignore)
+					break;
+				
+				script.jump(initialPos);
+				command = script.nextCommand();
+			}
+			
+			if (ignore)
+				break;
+			
+			script.jump(loopEndStack.front());
+			loopEndStack.pop_front();
 			break;
 		}
 		case S_IF: {
@@ -711,7 +874,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			
 			ComparisonOperator oper = getComparisonOperator(args[1]);
 			if (oper == INVALID_COMPARISON_OPERATOR) {
-				cout << "SCRIPT ERROR: invalid comparison operator (catch 1): " << args[1] << endl;
+				cout << "SCRIPT ERROR: invalid comparison operator (if, catch 1): " << args[1] << endl;
 				script.invalidate();
 				return;
 			}
@@ -775,7 +938,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 							break;
 						}
 						default: {
-							cout << "SCRIPT ERROR: invalid comparison operator (catch 2)" << endl;
+							cout << "SCRIPT ERROR: invalid comparison operator (if, catch 2)" << endl;
 							script.invalidate();
 							return;
 						}
@@ -839,9 +1002,15 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 				       script.isValid()) {
 					executeScriptCommand(command);
 					
+					if (ignore)
+						break;
+					
 					command = script.nextCommand();
 				}
 			}
+			
+			if (ignore)
+				break;
 			
 			script.jump(endifPos);
 			break;
@@ -962,9 +1131,26 @@ void ScriptEngine::executeVoidOperation(ScriptOperation operation) {
 			cout << "Script execution has begun." << endl;
 			break;
 		}
+		case S_BREAK: {
+			if (loopEndStack.empty()) {
+				cout << "SCRIPT ERROR: Floating BREAK statement." << endl;
+				script.invalidate();
+				break;
+			}
+			
+			ignore = true;
+			script.jump(loopEndStack.front());
+			loopEndStack.pop_front();
+			break;
+		}
 		case S_ENDFOR: {
 			//should never be executed - mainly for debugging
 			cout << "For loop ended." << endl;
+			break;
+		}
+		case S_ENDWHILE: {
+			//should never be executed - mainly for debugging
+			cout << "While loop ended." << endl;
 			break;
 		}
 		case S_ELSE: {
@@ -973,6 +1159,14 @@ void ScriptEngine::executeVoidOperation(ScriptOperation operation) {
 			break;
 		}
 		case S_ENDIF: {
+			break;
+		}
+		case S_MUTE: {
+			GlobalVars::getInstance()->setLogToConsole(false);
+			break;
+		}
+		case S_UNMUTE: {
+			GlobalVars::getInstance()->setLogToConsole(true);
 			break;
 		}
 		case S_DISABLEWORK: {
@@ -1051,6 +1245,7 @@ long ScriptEngine::eval() {
 	while (script.isValid()) {
 		Command command = script.nextCommand();
 		
+		ignore = false;
 		executeScriptCommand(command);
 	}
 	

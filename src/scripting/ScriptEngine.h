@@ -39,7 +39,8 @@ private:
 	static std::map<std::string, ComparisonOperator> comparisonOperators;
 	
 	static Logger log;
-	std::deque<int> loopStack;
+	std::deque<int> loopEndStack;
+	bool ignore = false;
 	Script script;
 	
 	std::vector<std::string> scriptArgs;

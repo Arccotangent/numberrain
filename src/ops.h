@@ -48,6 +48,11 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #include "vector/VectorPolarToRectangular.h"
 #include "vector/VectorRectangularToPolar.h"
 
+#include "matrix/MatrixAddition.h"
+#include "matrix/MatrixSubtraction.h"
+#include "matrix/MatrixMultiplication.h"
+#include "matrix/MatrixDeterminant.h"
+
 #include "scripting/ScriptEngine.h"
 
 #endif //NUMBERRAIN_OPS_H

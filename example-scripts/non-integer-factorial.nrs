@@ -23,23 +23,23 @@ ASSIGN terms;
 
 # begin calculation
 
+MUTE; # no one is going to go through and read the millions of lines of work done by this loop
+
 NOP 1;
 ASSIGN res;
 
+# increment term amount for the loop so we actually do the amount of terms set above and not one less
+ADD 1 terms;
+ASSIGN terms;
+
 FOR k 1 terms 1;
 	DIV 1 k;
-	ASSIGN recipK;
-
-	DIV arg k;
-	ASSIGN arg/k; # valid variable name
-
-	ADD 1 recipK;
-	ASSIGN numerBase;
-
-	EXP numerBase arg;
+	ADD 1 result;
+	EXP result arg;
 	ASSIGN numer;
 
-	ADD 1 arg/k;
+	DIV arg k;
+	ADD 1 result;
 	ASSIGN denom;
 
 	DIV numer denom;
@@ -48,32 +48,31 @@ FOR k 1 terms 1;
 	MUL res term;
 	ASSIGN res;
 
-	PRINT "finished term " k;
+	# print a progress report every 10,000 terms
+	MOD k 10000;
+	IF result == 0;
+		PRINT "finished term " k; # PRINT statements are unaffected by MUTE/UNMUTE
+	ENDIF;
 ENDFOR;
 
 ROUND arg;
 ASSIGN argInt;
 
+# check if our argument is an integer - then we can compare against real factorial value
 IF arg == argInt;
 	FCT argInt;
-    ASSIGN realFactorial;
+	ASSIGN realFactorial; # snag this value for later
 
-    SUB realFactorial res;
-    ASSIGN errorNumer;
-
-    ABS errorNumer;
-    ASSIGN errorNumer;
-
-    DIV errorNumer realFactorial;
-    ASSIGN error;
-
-    MUL error 100;
+    SUB result res; # result register isn't cleared - we can keep working as if the above ASSIGN statement wasn't there
+    ABS result;
+    DIV result realFactorial;
+    MUL result 100;
     ASSIGN error;
 
     PRINT "";
     PRINT "factorial of " arg " is approximately " res;
     PRINT "real factorial of " arg " is " realFactorial;
-    PRINT "the percent error is" error " percent";
+    PRINT "the percent error is " error "%";
     PRINT "";
 ELSE;
 	PRINT "";

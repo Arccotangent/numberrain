@@ -1,6 +1,6 @@
 # ENABLEWORK
 
-`ENABLEWORK` is a special operation.
+`ENABLEWORK` is an I/O operation.
 
 ## Description
 

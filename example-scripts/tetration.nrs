@@ -20,10 +20,8 @@ NOP a;
 ASSIGN res;
 
 FOR i b 0 -1;
-
-EXP a res;
-ASSIGN res;
-
+	EXP a res;
+	ASSIGN res;
 ENDFOR;
 
 PRINT "evaluated " a " tetrated to " b;

@@ -15,32 +15,29 @@ You should have received a copy of the GNU Affero General Public License
 along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "GlobalVars.h"
+#include "MatrixAddition.h"
 
 using namespace std;
 
-GlobalVars *GlobalVars::getInstance() {
-	static GlobalVars *instance = nullptr;
+Logger MatrixAddition::log = Logger("MatrixAddition");
+
+long MatrixAddition::eval() {
+	auto start = chrono::system_clock::now();
 	
-	if (instance == nullptr) {
-		instance = new GlobalVars();
+	Matrix sum = arguments[0];
+	log.i("Adding matrices, starting with sum of:\n%s", fmt(sum).c_str());
+	
+	for (size_t i = 1; i < arguments.size(); i++) {
+		Matrix arg = arguments[i];
+		Matrix newSum = sum + arg;
+		log.r("Sum is currently:\n%s\nafter argument %i:\n%s\n%s+\n%s=\n%s\n", fmt(sum).c_str(), i, fmt(arg).c_str(),
+		      fmt(sum).c_str(), fmt(arg).c_str(), fmt(newSum).c_str());
+		sum = newSum;
 	}
 	
-	return instance;
-}
-
-void GlobalVars::setLogToConsole(bool value) {
-	this->logToConsole = value;
-}
-
-bool GlobalVars::shouldLogToConsole() {
-	return logToConsole;
-}
-
-void GlobalVars::setShowWork(bool value) {
-	this->showWork = value;
-}
-
-bool GlobalVars::shouldShowWork() {
-	return showWork;
+	auto end = chrono::system_clock::now();
+	
+	result = sum;
+	
+	return chrono::duration_cast<chrono::microseconds>(end - start).count();
 }

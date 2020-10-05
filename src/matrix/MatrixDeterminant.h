@@ -15,9 +15,23 @@ You should have received a copy of the GNU Affero General Public License
 along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef NUMBERRAIN_VERSION_H
-#define NUMBERRAIN_VERSION_H
+#ifndef NUMBERRAIN_MATRIXDETERMINANT_H
+#define NUMBERRAIN_MATRIXDETERMINANT_H
 
-#define VERSION_STR "version 0.1-dev7"
+#include "../MatrixOperation.h"
 
-#endif //NUMBERRAIN_VERSION_H
+class MatrixDeterminant : public virtual MatrixOperation {
+private:
+	static Logger log;
+	static bool invalidated;
+	
+	static Real calcDet(const Matrix &matrix, unsigned int levels);
+
+public:
+	using MatrixOperation::MatrixOperation;
+	
+	long eval() override;
+};
+
+
+#endif //NUMBERRAIN_MATRIXDETERMINANT_H
