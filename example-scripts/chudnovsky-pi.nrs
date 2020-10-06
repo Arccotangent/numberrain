@@ -1,0 +1,82 @@
+# implementation of the chudnovsky algorithm to calculate pi to high precision
+# this script takes 2 terms of the infinite series
+# each term of the series yields about 14 correct digits of pi
+######################
+# NOTICE: the large numbers created by the algorithm overload Numberrain early on
+# this leads to a significant loss of precision - 2 terms produces about as many correct digits as one can get here
+# this is an inherent limitation of Numberrain - all numbers (even those internally used) are limited to the precision set at the beginning of each script
+######################
+
+!PRECISION 100
+
+BEGIN;
+
+NOP 2; # change the number of terms here
+ASSIGN terms;
+
+# begin calculation
+
+NOP 0;
+ASSIGN sum;
+
+MUTE; # work isn't very useful here
+
+FOR k 0 terms 1;
+	# numerator
+
+	EXP -1 k;
+	ASSIGN numerTerm1;
+
+	MUL 6 k;
+	FCT result;
+	ASSIGN numerTerm2;
+
+	MUL 545140134 k;
+	ADD result 13591409;
+	ASSIGN numerTerm3;
+
+	MUL numerTerm1 numerTerm2 numerTerm3;
+	ASSIGN numer;
+
+	# denominator
+
+	MUL 3 k;
+	FCT result;
+	ASSIGN denomTerm1;
+
+	FCT k;
+	EXP result 3;
+	ASSIGN denomTerm2;
+
+	MUL 3 k;
+	ADD result 1.5;
+	ASSIGN denomTerm3Pwr;
+
+	EXP 640320 denomTerm3Pwr;
+	ASSIGN denomTerm3;
+
+	MUL denomTerm1 denomTerm2 denomTerm3;
+	ASSIGN denom;
+
+	DIV numer denom;
+	ASSIGN term;
+
+	ADD sum term;
+	ASSIGN sum;
+ENDFOR;
+
+MUL sum 12;
+ASSIGN _pi;
+
+DIV 1 _pi;
+ASSIGN _pi;
+
+UNMUTE;
+
+PRINT "";
+PRINT "we used " terms " terms of the chudnovsky algorithm";
+PRINT "calculated value for pi is " _pi;
+PRINT "real value for pi is       " pi;
+PRINT "";
+
+END;

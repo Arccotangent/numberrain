@@ -6,7 +6,7 @@
 
 `BREAK` is used to break out of for/while loops prematurely.
 
-`BREAK` statements floating in scripts will cause the script to crash.
+`BREAK` statements floating outside of loops will cause your script to crash.
 
 ## Usage
 

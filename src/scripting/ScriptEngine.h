@@ -18,6 +18,7 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef NUMBERRAIN_SCRIPTENGINE_H
 #define NUMBERRAIN_SCRIPTENGINE_H
 
+#include "../ops.h"
 #include "../StringOperation.h"
 #include "Script.h"
 #include "../logging/Logger.h"
@@ -41,6 +42,7 @@ private:
 	static Logger log;
 	std::deque<int> loopEndStack;
 	bool ignore = false;
+	bool cont = false;
 	Script script;
 	
 	std::vector<std::string> scriptArgs;
@@ -49,7 +51,7 @@ private:
 	
 	static ComparisonOperator getComparisonOperator(const std::string &oper);
 	
-	bool isValidType(const std::string &value, DataType type);
+	static bool isValidType(const std::string &value, DataType type);
 	
 	bool isReservedVariable(const std::string &varName);
 	
@@ -66,6 +68,10 @@ private:
 	void executeIntegerOperation(ScriptOperation operation, const std::vector<Integer> &args);
 	
 	void executeVectorOperation(ScriptOperation operation, const std::vector<Vector> &args);
+	
+	void executeMatrixOperation(ScriptOperation operation, const std::vector<Matrix> &args);
+	
+	void executeArrayOperation(ScriptOperation operation, const std::vector<StringArray> &args);
 	
 	void executeStringOperation(ScriptOperation operation, const std::vector<std::string> &args);
 	

@@ -1,0 +1,37 @@
+# demonstration of matrix capabilities built into Numberrain scripting in 0.1-dev8
+
+!PRECISION 20
+
+BEGIN;
+
+# matrices can be constructed row by row
+AC 1 2 3;
+ASSIGN row1;
+
+AC 4 5 6;
+ASSIGN row2;
+
+AC 7 8 9;
+ASSIGN row3;
+
+MC row1 row2 row3;
+ASSIGN mtx1;
+
+PRINT mtx1;
+
+# or one-shot using the same syntax as on the command line
+
+MC "2,4,6/8,10,12/14,16,18";
+ASSIGN mtx2;
+
+PRINT mtx2;
+
+MMUL mtx1 mtx2;
+PRINT result;
+
+# identity matrix generator
+MIDENT 5;
+PRINT "5x5 identity matrix:";
+PRINT result;
+
+END;

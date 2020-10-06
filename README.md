@@ -1,7 +1,7 @@
 # numberrain
 
-Numberrain is a command line calculator developed by a student for students.
-It is currently capable of evaluating various basic operations while showing the steps of the calculation wherever appropriate.
+Numberrain is a command line calculator developed by a student for students. It is currently capable of performing
+various mathematical computations while showing the steps of the calculation wherever appropriate.
 
 Additionally, Numberrain is fully scriptable.
 See example scripts in the `example-scripts/` directory for more information.
@@ -26,7 +26,7 @@ mkdir build
 cd build
 cmake ..
 make -j <number of cpu threads, or enter 4 if unsure>
-sudo make install (optional, requires superuser)
+sudo install numberrain /usr/local/bin (optional, requires superuser)
 ./numberrain
 ```
 
@@ -44,30 +44,43 @@ Run Numberrain with no arguments to print the usage instructions.
 
 ### Examples
 
+2 + 2:
+
 ```
-❯ ./numberrain add 2 2
-Numberrain version 0.1 by Arccotangent
+❯ numberrain add 2 2
+Numberrain version 0.1-dev8 by Arccotangent
+Loading configuration from file: /home/user/.numberrain/config.json
+Precision was set to 50 digits.
+Numberrain show work is ENABLED (can be overridden by scripts)
 Operation: add
 Arguments (real numbers): { 2 2 }
-Adding numbers, starting with sum of 0.
-Sum is currently 0, after argument 0 (2): 0 + 2 = 2
-Sum is currently 2, after argument 1 (2): 2 + 2 = 4
 ===================================================================================
-Time: 33 microseconds
+[INFO] [Addition] Adding numbers, starting with sum of 2.
+[WORK] [Addition] Sum is currently 2, after argument 1 (2): 2 + 2 = 4
+===================================================================================
+Time: 17 microseconds
 Final result: 4
 ```
 
+13 * 37:
+
 ```
-❯ ./numberrain mul 13 37
-Numberrain version 0.1 by Arccotangent
+❯ numberrain mul 13 37
+Numberrain version 0.1-dev8 by Arccotangent
+Loading configuration from file: /home/user/.numberrain/config.json
+Precision was set to 50 digits.
+Numberrain show work is ENABLED (can be overridden by scripts)
 Operation: mul
 Arguments (real numbers): { 13 37 }
-Multiplying numbers, starting from 13.
-Product is currently 13, after argument 1 (37): 13 * 37 = 481
 ===================================================================================
-Time: 12 microseconds
+[INFO] [Multiplication] Multiplying numbers, starting from 13.
+[WORK] [Multiplication] Product is currently 13, after argument 1 (37): 13 * 37 = 481
+===================================================================================
+Time: 17 microseconds
 Final result: 481
 ```
+
+For more, see [EXAMPLES.md](EXAMPLES.md)
 
 ## Main Features
 
@@ -84,7 +97,8 @@ Numberrain currently has the following operations built in:
 - Vector arithmetic (addition, subtraction, scalar multiplication)
 - Other vector operations including dot and cross product
 - Vector conversions (polar <-> rectangular)
-- Shows steps taken to arrive at final result wherever appropriate
+- Matrix operations (addition, subtraction, multiplication, determinant)
+- Shows steps taken to arrive at final answer
 - Scripting
 
 ### Planned Features
@@ -93,7 +107,7 @@ The following is a list of planned features being considered to be added into Nu
 This list is always subject to change and some ideas may be removed without being implemented. This list is in no
 particular order.
 
-- Matrix operations (soon)
+- Importing code from other scripts (soon)
 - Solving quadratic and cubic (maybe quartic or even nth-degree?) equations (somewhat soon)
 - CAS & symbolic operations (not very soon)
 

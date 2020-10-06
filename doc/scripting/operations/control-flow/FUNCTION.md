@@ -15,6 +15,7 @@ Valid return types are:
 - `REAL` (returning a real number)
 - `INT` (returning an integer)
 - `VECTOR` (returning a vector)
+- `MATRIX` (returning a matrix)
 - `STRING` (returning a string)
 
 Arguments are specified by name and data type separated by a colon.

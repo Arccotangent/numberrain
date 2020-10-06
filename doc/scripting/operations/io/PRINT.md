@@ -24,4 +24,7 @@ So if there is a variable called `sum` with `5` in it, the statement `PRINT the 
 
 `PRINT "test print statement";` - Prints `test print statement` to the console.
 
-`PRINT "the sum is " sum;` - Prints `the sum is 5` to the console, assuming the variable `sum` exists and contains the value `5`.
+`PRINT "the sum is " sum;` - Prints `the sum is 5` to the console, assuming the variable `sum` exists and contains the
+value `5`.
+
+`PRINT "my array = " array;` - Prints the contents of the array named `array` separated by commas.

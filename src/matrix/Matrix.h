@@ -57,30 +57,52 @@ public:
 	Matrix operator-(const Matrix &other) const;
 };
 
-static std::string fmtInternal(const Matrix &matrix) {
-	if (matrix.isReal()) {
-		return fmt(matrix[0][0]);
-	}
+static Matrix *parseMatrix(const std::string &value) {
+	RealMatrix matrixRaw;
 	
-	std::stringstream ss;
+	bool consoleFormatted = value.find('[') != std::string::npos;
 	
-	Dimensions dim = matrix.getMatrixDimensions();
+	std::vector<std::string> rowStrings;
+	boost::algorithm::split(rowStrings, value, boost::algorithm::is_any_of(consoleFormatted ? "\n" : "/"));
 	
-	if (dim.first == 0 || dim.second == 0) {
-		return "0";
-	}
+	std::string charsToRemove = "[]";
 	
-	for (size_t i = 0; i < dim.second; i++) {
-		for (size_t j = 0; j < dim.first; j++) {
-			ss << fmt(matrix.get(j, i));
-			if (j < dim.first - 1)
-				ss << ",";
+	for (auto &rowStr : rowStrings) {
+		if (consoleFormatted) {
+			rowStr.erase(std::remove_if(rowStr.begin(), rowStr.end(), [charsToRemove](char ch) {
+				return charsToRemove.find(ch) != std::string::npos;
+			}), rowStr.end());
+			
+			boost::replace_all(rowStr, " ", ",");
+			boost::replace_all(rowStr, ",,", ",");
+			
+			if (rowStr.length() >= 2) {
+				rowStr = rowStr.substr(1, rowStr.length() - 2);
+			}
 		}
-		if (i < dim.second - 1)
-			ss << "/";
+		
+		//std::cout << "[debug] parseMatrix rowStr = " << rowStr << std::endl;
+		
+		if (rowStr == "," || rowStr.empty())
+			continue;
+		
+		std::vector<std::string> columnStrings;
+		boost::algorithm::split(columnStrings, rowStr, boost::algorithm::is_any_of(","));
+		
+		std::vector<Real> row;
+		for (const auto &columnStr : columnStrings) {
+			row.emplace_back(Real(columnStr));
+		}
+		
+		matrixRaw.emplace_back(row);
 	}
 	
-	return ss.str();
+	Matrix *matrix = Matrix::createMatrix(matrixRaw, matrixRaw.size() == 1 && matrixRaw[0].size() == 1);
+	if (matrix == nullptr) {
+		throw std::runtime_error("error occurred during matrix creation");
+	}
+	
+	return matrix;
 }
 
 static std::string fmt(const Matrix &matrix) {

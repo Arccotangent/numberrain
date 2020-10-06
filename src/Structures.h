@@ -20,9 +20,13 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <sstream>
 #include <boost/multiprecision/gmp.hpp>
+#include <boost/algorithm/string.hpp>
+#include <boost/algorithm/string_regex.hpp>
+#include <boost/regex.h>
 
 typedef boost::multiprecision::number<boost::multiprecision::gmp_int> Integer;
 typedef boost::multiprecision::number<boost::multiprecision::gmp_float<0>> Real;
+typedef std::vector<std::string> StringArray;
 
 struct Vector;
 
@@ -129,6 +133,84 @@ struct Vector {
 	}
 };
 
+static StringArray parseArray(const std::string &value) {
+	if (value[0] != '[' || value[value.length() - 1] != ']') {
+		throw std::runtime_error("invalid array notation");
+	}
+	
+	std::string newVal = value;
+	std::string charsToRemove = "[]";
+	newVal.erase(std::remove_if(newVal.begin(), newVal.end(), [charsToRemove](char ch) {
+		return charsToRemove.find(ch) != std::string::npos;
+	}), newVal.end());
+	
+	if (newVal.empty()) {
+		std::cout << "[debug] array newVal is empty" << std::endl;
+		return StringArray();
+	}
+	
+	std::vector<std::string> elements;
+	boost::algorithm::split(elements, newVal, boost::algorithm::is_any_of(","));
+	
+	StringArray arr;
+	
+	for (auto &elem : elements) {
+		while (!elem.empty() && elem[0] == ' ') { //remove leading spaces in elements other than the first
+			elem = elem.substr(1, elem.length() - 1);
+		}
+		
+		if (elem.empty()) {
+			throw std::runtime_error("empty array element");
+		}
+		
+		arr.emplace_back(elem);
+	}
+	
+	return arr;
+}
+
+static Vector parseVector(const std::string &value) {
+	std::vector<std::string> parts;
+	
+	if (boost::algorithm::contains(value, "i")) {
+		std::vector<std::string> parts2;
+		boost::algorithm::split_regex(parts2, value, boost::regex("\\s"));
+		
+		bool negative = false;
+		
+		std::stringstream ss1;
+		for (int i = 0; i < parts2.size(); i++) {
+			if (!boost::regex_search(parts2[i], boost::regex("[0-9]+"))) {
+				negative = parts2[i].find('-') != std::string::npos;
+				continue;
+			}
+			
+			if (negative)
+				ss1 << "-";
+			ss1 << parts2[i];
+			if (i < parts2.size() - 1)
+				ss1 << ",";
+		}
+		
+		std::string newArg = ss1.str();
+		std::string charsToRemove = "ijk ";
+		
+		newArg.erase(remove_if(newArg.begin(), newArg.end(), [charsToRemove](char ch) {
+			return charsToRemove.find(ch) != std::string::npos;
+		}), newArg.end());
+		
+		boost::algorithm::split(parts, newArg, boost::algorithm::is_any_of(","));
+	} else {
+		boost::algorithm::split(parts, value, boost::algorithm::is_any_of(","));
+	}
+	
+	Real x = Real(parts[0]);
+	Real y = parts.size() >= 2 ? Real(parts[1]) : 0.0;
+	Real z = parts.size() >= 3 ? Real(parts[2]) : 0.0;
+	
+	return Vector(x, y, z);
+}
+
 static std::string fmt(const Real &real) {
 	std::string str = real.str(boost::multiprecision::mpf_float::default_precision(), std::ios::fixed);
 	
@@ -154,6 +236,26 @@ static std::string fmt(const Real &real) {
 
 static std::string fmt(const Vector &vec) {
 	return vec.str();
+}
+
+static std::string fmt(const StringArray &arr) {
+	if (arr.empty())
+		return "[ ]";
+	
+	std::stringstream ss;
+	
+	ss << "[";
+	
+	for (size_t i = 0; i < arr.size(); i++) {
+		ss << arr[i];
+		
+		if (i < arr.size() - 1)
+			ss << ", ";
+	}
+	
+	ss << "]";
+	
+	return ss.str();
 }
 
 #endif //NUMBERRAIN_STRUCTURES_H

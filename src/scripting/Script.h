@@ -71,6 +71,23 @@ enum ScriptOperation {
 	S_VECTOR_GET_Y,
 	S_VECTOR_GET_Z,
 	
+	S_MATRIX_CONSTRUCT,
+	S_MATRIX_X_QUERY,
+	S_MATRIX_Y_QUERY,
+	S_MATRIX_EXTRACT,
+	S_MATRIX_IDENTITY_GENERATOR,
+	S_MATRIX_ADDITION,
+	S_MATRIX_SUBTRACTION,
+	S_MATRIX_MULTIPLICATION,
+	S_MATRIX_DETERMINANT,
+	
+	S_ARRAY_CONSTRUCT,
+	S_ARRAY_EXTRACT,
+	S_ARRAY_LENGTH_QUERY,
+	S_ARRAY_PREPEND,
+	S_ARRAY_APPEND,
+	S_ARRAY_DELETE,
+	
 	S_FLOOR,
 	S_CEIL,
 	S_ROUND,
@@ -80,6 +97,7 @@ enum ScriptOperation {
 	S_PRINT,
 	
 	S_BREAK,
+	S_CONTINUE,
 	S_FOR,
 	S_ENDFOR,
 	S_WHILE,
@@ -115,7 +133,8 @@ enum OperationType {
 	REAL_SCR,
 	INTEGER_SCR,
 	VECTOR_SCR,
-	//MATRIX_SCR,
+	MATRIX_SCR,
+	ARRAY_SCR,
 	STRING_SCR,
 	
 	INVALID_OP_TYPE
@@ -126,7 +145,8 @@ enum DataType {
 	DT_REAL,
 	DT_INTEGER,
 	DT_VECTOR,
-	//DT_MATRIX,
+	DT_MATRIX,
+	DT_ARRAY,
 	DT_STRING,
 	
 	INVALID_DATA_TYPE
@@ -171,8 +191,6 @@ private:
 	int cursor = 0;
 	
 	static bool checkPreOpArgCount(PreScriptOperation operation, uint32_t argCount);
-	
-	static bool checkOpArgCount(ScriptOperation operation, uint32_t argCount);
 
 public:
 	Script() = default;
@@ -180,6 +198,8 @@ public:
 	static OperationType getOpType(ScriptOperation op);
 	
 	static DataType getDataType(const std::string &code);
+	
+	static bool checkOpArgCount(ScriptOperation operation, uint32_t argCount);
 	
 	void lockRO();
 	

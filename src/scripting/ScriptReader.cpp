@@ -36,18 +36,18 @@ map<string, ScriptOperation> ScriptReader::opcodes = {
 		{"LCM",    S_LEAST_COMMON_MULTIPLE},
 		{"ABS",    S_ABSOLUTE_VALUE},
 		
-		{"LN",     S_LN},
-		{"LOG10",  S_LOG10},
-		{"LOGB",   S_LOGB},
+		{"LN",          S_LN},
+		{"LOG10",       S_LOG10},
+		{"LOGB",        S_LOGB},
 		
-		{"SIN",    S_SINE},
-		{"COS",    S_COSINE},
-		{"TAN",    S_TANGENT},
-		{"ARCSIN", S_ARCSINE},
-		{"ARCCOS", S_ARCCOSINE},
-		{"ARCTAN", S_ARCTANGENT},
+		{"SIN",         S_SINE},
+		{"COS",         S_COSINE},
+		{"TAN",         S_TANGENT},
+		{"ARCSIN",      S_ARCSINE},
+		{"ARCCOS",      S_ARCCOSINE},
+		{"ARCTAN",      S_ARCTANGENT},
 		
-		{"VADD",   S_VECTOR_ADD},
+		{"VADD",        S_VECTOR_ADD},
 		{"VSUB",        S_VECTOR_SUBTRACT},
 		{"VSMUL",       S_VECTOR_SCALAR_MULTIPLY},
 		{"VDOT",        S_VECTOR_DOT_PRODUCT},
@@ -60,6 +60,23 @@ map<string, ScriptOperation> ScriptReader::opcodes = {
 		{"VY",          S_VECTOR_GET_Y},
 		{"VZ",          S_VECTOR_GET_Z},
 		
+		{"MC",          S_MATRIX_CONSTRUCT},
+		{"MX",          S_MATRIX_X_QUERY},
+		{"MY",          S_MATRIX_Y_QUERY},
+		{"ME",          S_MATRIX_EXTRACT},
+		{"MIDENT",      S_MATRIX_IDENTITY_GENERATOR},
+		{"MADD",        S_MATRIX_ADDITION},
+		{"MSUB",        S_MATRIX_SUBTRACTION},
+		{"MMUL",        S_MATRIX_MULTIPLICATION},
+		{"MDET",        S_MATRIX_DETERMINANT},
+		
+		{"AC",          S_ARRAY_CONSTRUCT},
+		{"AE",          S_ARRAY_EXTRACT},
+		{"ALEN",        S_ARRAY_LENGTH_QUERY},
+		{"APRE",        S_ARRAY_PREPEND},
+		{"APOST",       S_ARRAY_APPEND},
+		{"ADELETE",     S_ARRAY_DELETE},
+		
 		{"FLOOR",       S_FLOOR},
 		{"CEIL",        S_CEIL},
 		{"ROUND",       S_ROUND},
@@ -69,6 +86,7 @@ map<string, ScriptOperation> ScriptReader::opcodes = {
 		{"PRINT",       S_PRINT},
 		
 		{"BREAK",       S_BREAK},
+		{"CONTINUE",    S_CONTINUE},
 		{"FOR",         S_FOR},
 		{"ENDFOR",      S_ENDFOR},
 		{"WHILE",       S_WHILE},
@@ -305,7 +323,12 @@ Script ScriptReader::readScript() {
 					opBuffer = getOpcode(buf);
 					switch (opBuffer) {
 						case INVALID_OP: {
-							cout << "[LINE " << line << "] Script error: Invalid operation '" << buf << "'." << endl;
+							if (buf.empty()) {
+								cout << "[LINE " << line << "] Script error: Floating semicolon." << endl;
+							} else {
+								cout << "[LINE " << line << "] Script error: Invalid operation '" << buf << "'."
+								     << endl;
+							}
 							script.invalidate();
 							return script;
 						}
@@ -333,12 +356,6 @@ Script ScriptReader::readScript() {
 							}
 							break;
 						}
-					}
-					
-					if (Script::getOpType(opBuffer) != VOID_SCR) {
-						cout << "[LINE " << line << "] Script error: Floating semicolon." << endl;
-						script.invalidate();
-						return script;
 					}
 				} else {
 					if (quote) {

@@ -1,0 +1,30 @@
+# demonstration of arrays built into Numberrain scripting in 0.1-dev8
+
+!PRECISION 20
+
+BEGIN;
+
+# create an array
+AC 3 4 5;
+ASSIGN array;
+
+PRINT array;
+
+# prepend to array
+APRE array 1 2;
+ASSIGN array;
+
+PRINT "prepending 1 and 2: " array;
+
+# append to array
+APOST array 6 7 9;
+ASSIGN array;
+
+PRINT "appending 6, 7, and 9: " array;
+
+ADELETE array 7;
+ASSIGN array;
+
+PRINT "deleting 9: " array;
+
+END;

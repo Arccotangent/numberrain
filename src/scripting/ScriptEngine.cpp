@@ -17,7 +17,6 @@ along with Numberrain.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ScriptEngine.h"
 #include "ScriptReader.h"
-#include "../ops.h"
 #include <boost/algorithm/string.hpp>
 #include <boost/algorithm/string_regex.hpp>
 #include <boost/regex.h>
@@ -43,9 +42,6 @@ ComparisonOperator ScriptEngine::getComparisonOperator(const string &oper) {
 
 bool ScriptEngine::isValidType(const string &value, DataType type) {
 	switch (type) {
-		case DT_VOID: {
-			return true;
-		}
 		case DT_REAL: {
 			try {
 				auto val = Real(value);
@@ -64,51 +60,31 @@ bool ScriptEngine::isValidType(const string &value, DataType type) {
 		}
 		case DT_VECTOR: {
 			try {
-				vector<string> parts;
-				
-				if (boost::algorithm::contains(value, "i")) {
-					vector<string> parts2;
-					boost::algorithm::split_regex(parts2, value, boost::regex("\\s"));
-					
-					bool negative = false;
-					
-					stringstream ss1;
-					for (int i = 0; i < parts2.size(); i++) {
-						if (!boost::regex_search(parts2[i], boost::regex("[0-9]+"))) {
-							negative = parts2[i].find('-') != string::npos;
-							continue;
-						}
-						
-						if (negative)
-							ss1 << "-";
-						ss1 << parts2[i];
-						if (i < parts2.size() - 1)
-							ss1 << ",";
-					}
-					
-					string newArg = ss1.str();
-					string charsToRemove = "ijk ";
-					
-					newArg.erase(remove_if(newArg.begin(), newArg.end(), [charsToRemove](char ch) {
-						return charsToRemove.find(ch) != string::npos;
-					}), newArg.end());
-					
-					boost::algorithm::split(parts, newArg, boost::algorithm::is_any_of(","));
-				} else {
-					boost::algorithm::split(parts, value, boost::algorithm::is_any_of(","));
-				}
-				
-				Real x = Real(parts[0]);
-				Real y = parts.size() >= 2 ? Real(parts[1]) : 0.0;
-				Real z = parts.size() >= 3 ? Real(parts[2]) : 0.0;
+				parseVector(value);
 				return true;
 			} catch (exception &e) {
 				return false;
 			}
 		}
-		case DT_STRING: {
-			return true;
+		case DT_MATRIX: {
+			try {
+				parseMatrix(value);
+				return true;
+			} catch (exception &e) {
+				return false;
+			}
 		}
+		case DT_ARRAY: {
+			try {
+				parseArray(value);
+				return true;
+			} catch (exception &e) {
+				return false;
+			}
+		}
+		case DT_STRING:
+		case DT_VOID:
+			return true;
 		default: {
 			return false;
 		}
@@ -273,6 +249,49 @@ void ScriptEngine::executeScriptCommand(const Command &command) {
 			}
 			
 			executeVectorOperation(command.first, arguments);
+			break;
+		}
+		case MATRIX_SCR: {
+			vector<Matrix> arguments;
+			
+			for (auto &argStr : args) {
+				if (!variableExists(argStr)) {
+					if (!isValidType(argStr, DT_MATRIX)) {
+						cout << "SCRIPT ERROR: invalid matrix" << endl;
+						script.invalidate();
+						return;
+					}
+				}
+				
+				Matrix *matrix = parseMatrix(variableExists(argStr) ? getVariableValue(argStr) : argStr);
+				if (matrix == nullptr) {
+					cout << "SCRIPT ERROR: error occurred while creating matrix: " << argStr << endl;
+					script.invalidate();
+					return;
+				}
+				
+				arguments.emplace_back(*matrix);
+			}
+			
+			executeMatrixOperation(command.first, arguments);
+			break;
+		}
+		case ARRAY_SCR: {
+			vector<StringArray> arguments;
+			
+			for (auto &argStr : args) {
+				if (!variableExists(argStr)) {
+					if (!isValidType(argStr, DT_ARRAY)) {
+						cout << "SCRIPT ERROR: invalid array notation or empty array element" << endl;
+						script.invalidate();
+						return;
+					}
+				}
+				
+				arguments.emplace_back(parseArray(variableExists(argStr) ? getVariableValue(argStr) : argStr));
+			}
+			
+			executeArrayOperation(command.first, arguments);
 			break;
 		}
 		case STRING_SCR: {
@@ -500,6 +519,35 @@ void ScriptEngine::executeIntegerOperation(ScriptOperation operation, const vect
 			result = fmt(op->getResult());
 			break;
 		}
+		case S_MATRIX_IDENTITY_GENERATOR: {
+			Integer size = args[0];
+			
+			if (size < 1) {
+				cout << "SCRIPT ERROR: attempted to generate an identity matrix smaller than 1x1" << endl;
+				script.invalidate();
+				break;
+			}
+			
+			RealMatrix mtxRaw;
+			
+			for (Integer y = 0; y < size; y++) {
+				vector<Real> row;
+				for (Integer x = 0; x < size; x++) {
+					row.emplace_back(x == y ? 1 : 0);
+				}
+				mtxRaw.emplace_back(row);
+			}
+			
+			Matrix *mtx = Matrix::createMatrix(mtxRaw, false);
+			if (mtx == nullptr) {
+				cout << "SCRIPT ERROR: error occurred while creating identity matrix" << endl;
+				script.invalidate();
+				break;
+			}
+			
+			result = fmt(*mtx);
+			break;
+		}
 		default: {
 			cout
 					<< "SCRIPT ERROR: attempted to execute operation with integers, yet it accepts something else (this is a bug, please report it!)"
@@ -583,6 +631,138 @@ void ScriptEngine::executeVectorOperation(ScriptOperation operation, const vecto
 	}
 }
 
+void ScriptEngine::executeMatrixOperation(ScriptOperation operation, const vector<Matrix> &args) {
+	switch (operation) {
+		case S_MATRIX_X_QUERY: {
+			result = to_string(args[0].getMatrixDimensions().first);
+			break;
+		}
+		case S_MATRIX_Y_QUERY: {
+			result = to_string(args[0].getMatrixDimensions().second);
+			break;
+		}
+		case S_MATRIX_ADDITION: {
+			size_t x = args[0].getMatrixDimensions().first;
+			size_t y = args[0].getMatrixDimensions().second;
+			
+			for (size_t i = 0; i < args.size(); i++) {
+				size_t tx = args[i].getMatrixDimensions().first;
+				size_t ty = args[i].getMatrixDimensions().second;
+				if (tx != x || ty != y) {
+					cout << "SCRIPT ERROR: incompatible matrix dimensions for addition at matrix argument " << i
+					     << " - expected " << x << "x" << y << ", got " << tx << "x" << ty << endl;
+					script.invalidate();
+					return;
+				}
+			}
+			
+			auto *op = new MatrixAddition(args);
+			
+			op->eval();
+			result = fmt(op->getResult());
+			break;
+		}
+		case S_MATRIX_SUBTRACTION: {
+			size_t x = args[0].getMatrixDimensions().first;
+			size_t y = args[0].getMatrixDimensions().second;
+			
+			for (size_t i = 0; i < args.size(); i++) {
+				size_t tx = args[i].getMatrixDimensions().first;
+				size_t ty = args[i].getMatrixDimensions().second;
+				if (tx != x || ty != y) {
+					cout << "SCRIPT ERROR: incompatible matrix dimensions for subtraction at matrix argument " << i
+					     << " - expected " << x << "x" << y << ", got " << tx << "x" << ty << endl;
+					script.invalidate();
+					return;
+				}
+			}
+			
+			auto *op = new MatrixSubtraction(args);
+			
+			op->eval();
+			result = fmt(op->getResult());
+			break;
+		}
+		case S_MATRIX_MULTIPLICATION: {
+			size_t aX = args[0].getMatrixDimensions().first;
+			size_t aY = args[0].getMatrixDimensions().second;
+			size_t bX = args[1].getMatrixDimensions().first;
+			size_t bY = args[1].getMatrixDimensions().second;
+			
+			//cout << "[debug] matrix 1 = " << endl << fmt(args[0]) << endl;
+			//cout << "[debug] matrix 2 = " << endl << fmt(args[1]) << endl;
+			
+			if (aY != bX) {
+				cout
+						<< "SCRIPT ERROR: incompatible matrix dimensions for multiplication (first 2 matrices) - first matrix Y ("
+						<< aY << ") must equal second matrix X (" << bX << ")" << endl;
+				script.invalidate();
+				break;
+			}
+			
+			size_t newX = aX;
+			size_t newY = bY;
+			
+			for (size_t i = 2; i < args.size(); i++) {
+				size_t argX = args[i].getMatrixDimensions().first;
+				size_t argY = args[i].getMatrixDimensions().second;
+				
+				if (newY != argX) {
+					cout << "SCRIPT ERROR: incompatible matrix dimensions for multiplication at matrix argument " << i
+					     << " - inner dimensions are unequal - first matrix Y = " << newY << ", second matrix X = "
+					     << argX << endl;
+					script.invalidate();
+					return;
+				}
+				
+				newY = argY;
+			}
+			
+			auto *op = new MatrixMultiplication(args);
+			
+			op->eval();
+			result = fmt(op->getResult());
+			break;
+		}
+		case S_MATRIX_DETERMINANT: {
+			if (args[0].getMatrixDimensions().first != args[0].getMatrixDimensions().second) {
+				cout << "SCRIPT ERROR: attempted to take the determinant of a non-square matrix" << endl;
+				script.invalidate();
+				break;
+			}
+			
+			auto *op = new MatrixDeterminant(args);
+			
+			op->eval();
+			result = fmt(op->getResult());
+			break;
+		}
+		default: {
+			cout
+					<< "SCRIPT ERROR: attempted to execute operation with matrices, yet it accepts something else (this is a bug, please report it!)"
+					<< endl;
+			script.invalidate();
+			break;
+		}
+	}
+}
+
+void ScriptEngine::executeArrayOperation(ScriptOperation operation, const vector<StringArray> &args) {
+	switch (operation) {
+		case S_ARRAY_LENGTH_QUERY: {
+			result = to_string(args[0].size());
+			break;
+		}
+		default: {
+			cout
+					<< "SCRIPT ERROR: attempted to execute operation with arrays, yet it accepts something else (this is a bug, please report it!)"
+					<< endl;
+			script.invalidate();
+			break;
+		}
+	}
+}
+
 void ScriptEngine::executeStringOperation(ScriptOperation operation, const vector<string> &args) {
 	switch (operation) {
 		case S_PRINT: {
@@ -633,7 +813,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			int initialPos = script.getPosition();
 			int levels = 1;
 			
-			Command command = script.nextCommand();
+			Command command;
 			while (levels > 0) {
 				if (!script.isValid()) {
 					cout
@@ -654,7 +834,9 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 				}
 			}
 			
-			loopEndStack.emplace_front(script.getPosition());
+			int endForPos = script.getPosition();
+			
+			loopEndStack.emplace_front(endForPos);
 			script.jump(initialPos);
 			
 			for (int i = 1; i < 4; i++) {
@@ -694,6 +876,13 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 				
 				executeScriptCommand(command);
 				
+				if (cont) {
+					loopSpecs[0] += loopSpecs[2];
+					script.jump(initialPos);
+					cont = false;
+					continue;
+				}
+				
 				if (ignore)
 					break;
 			}
@@ -715,7 +904,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			int initialPos = script.getPosition();
 			int levels = 1;
 			
-			Command command = script.nextCommand();
+			Command command;
 			while (levels > 0) {
 				if (!script.isValid()) {
 					cout
@@ -736,7 +925,9 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 				}
 			}
 			
-			loopEndStack.emplace_front(script.getPosition());
+			int endWhilePos = script.getPosition();
+			
+			loopEndStack.emplace_front(endWhilePos);
 			script.jump(initialPos);
 			
 			ComparisonOperator oper = getComparisonOperator(args[1]);
@@ -822,6 +1013,13 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 					
 					executeScriptCommand(command);
 					
+					if (cont) {
+						script.jump(initialPos);
+						command = script.nextCommand();
+						cont = false;
+						continue;
+					}
+					
 					if (ignore)
 						break;
 					
@@ -844,7 +1042,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 		}
 		case S_IF: {
 			int initialPos = script.getPosition();
-			int endifPos;
+			int endIfPos;
 			
 			int levels = 1;
 			
@@ -869,7 +1067,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 				}
 			}
 			
-			endifPos = script.getPosition();
+			endIfPos = script.getPosition();
 			script.jump(initialPos);
 			
 			ComparisonOperator oper = getComparisonOperator(args[1]);
@@ -983,7 +1181,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 					}
 					
 					script.jump(condPos);
-					if (endifPos - condPos >= 2) {
+					if (endIfPos - condPos >= 2) {
 						command = script.nextCommand();
 					}
 					
@@ -1002,7 +1200,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 				       script.isValid()) {
 					executeScriptCommand(command);
 					
-					if (ignore)
+					if (ignore || cont)
 						break;
 					
 					command = script.nextCommand();
@@ -1012,7 +1210,7 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			if (ignore)
 				break;
 			
-			script.jump(endifPos);
+			script.jump(endIfPos);
 			break;
 		}
 		case S_ELSEIF: {
@@ -1111,6 +1309,220 @@ void ScriptEngine::executeStringOperation(ScriptOperation operation, const vecto
 			script.jump(origPos);
 			break;
 		}
+		case S_MATRIX_CONSTRUCT: {
+			Matrix *mtx = nullptr;
+			
+			if (args[0].find('[') == string::npos) {
+				if (!variableExists(args[0])) {
+					if (!isValidType(args[0], DT_MATRIX)) {
+						cout << "SCRIPT ERROR: invalid matrix" << endl;
+						script.invalidate();
+						return;
+					}
+				}
+				
+				mtx = parseMatrix(variableExists(args[0]) ? getVariableValue(args[0]) : args[0]);
+			} else {
+				RealMatrix mtxRaw;
+				mtxRaw.reserve(args.size());
+				
+				for (auto &arg : args) {
+					vector<Real> row;
+					
+					if (!variableExists(arg)) {
+						if (!isValidType(arg, DT_ARRAY)) {
+							cout << "SCRIPT ERROR: invalid array for matrix construction: " << arg << endl;
+							script.invalidate();
+							return;
+						}
+					}
+					
+					StringArray arr = parseArray(variableExists(arg) ? getVariableValue(arg) : arg);
+					
+					for (auto &numStr : arr) {
+						string num = variableExists(numStr) ? getVariableValue(numStr) : numStr;
+						if (!isValidType(num, DT_REAL)) {
+							cout << "SCRIPT ERROR: attempted to pass in non-real number argument '" << num
+							     << "' to matrix construction." << endl;
+							script.invalidate();
+							return;
+						}
+						
+						row.emplace_back(Real(num));
+					}
+					
+					mtxRaw.emplace_back(row);
+				}
+				
+				mtx = Matrix::createMatrix(mtxRaw, false);
+			}
+			
+			if (mtx == nullptr) {
+				cout << "SCRIPT ERROR: error occurred while constructing matrix" << endl;
+				script.invalidate();
+				break;
+			}
+			
+			result = fmt(*mtx);
+			break;
+		}
+		case S_ARRAY_CONSTRUCT: {
+			StringArray arr;
+			
+			for (const auto &arg : args) {
+				if (arg.empty())
+					continue;
+				
+				if (isValidType(arg, DT_ARRAY)) {
+					cout << "SCRIPT ERROR: attempted to create nested array" << endl;
+					script.invalidate();
+					return;
+				}
+				
+				string argFormatted;
+				
+				if (isValidType(arg, DT_VECTOR)) {
+					Vector vec = parseVector(arg);
+					
+					if (vec.y == 0 && vec.z == 0) {
+						argFormatted = arg;
+					} else {
+						argFormatted = fmt(vec);
+					}
+				} else if (isValidType(arg, DT_MATRIX)) {
+					argFormatted = fmt(*parseMatrix(arg));
+				} else {
+					argFormatted = arg;
+				}
+				
+				arr.emplace_back(argFormatted);
+			}
+			
+			result = fmt(arr);
+			break;
+		}
+		case S_ARRAY_EXTRACT: {
+			StringArray arr = parseArray(args[0]);
+			size_t index = strtoul(args[1].c_str(), nullptr, 10);
+			
+			if (index >= arr.size()) {
+				cout << "SCRIPT ERROR: array extraction index out of bounds" << endl;
+				script.invalidate();
+				break;
+			}
+			
+			result = arr[index];
+			break;
+		}
+		case S_ARRAY_PREPEND: {
+			StringArray arr = parseArray(args[0]);
+			StringArray newArr;
+			
+			for (size_t i = 1; i < args.size(); i++) {
+				if (args[i].empty())
+					continue;
+				
+				string argFormatted;
+				
+				if (isValidType(args[i], DT_VECTOR)) {
+					Vector vec = parseVector(args[i]);
+					
+					if (vec.y == 0 && vec.z == 0) {
+						argFormatted = args[i];
+					} else {
+						argFormatted = fmt(vec);
+					}
+				} else if (isValidType(args[i], DT_MATRIX)) {
+					argFormatted = fmt(*parseMatrix(args[i]));
+				} else {
+					argFormatted = args[i];
+				}
+				
+				newArr.emplace_back(argFormatted);
+			}
+			
+			for (auto &elem : arr) {
+				newArr.emplace_back(elem);
+			}
+			
+			result = fmt(newArr);
+			break;
+		}
+		case S_ARRAY_APPEND: {
+			StringArray arr = parseArray(args[0]);
+			StringArray newArr;
+			
+			for (auto &elem : arr) {
+				newArr.emplace_back(elem);
+			}
+			
+			for (size_t i = 1; i < args.size(); i++) {
+				if (args[i].empty())
+					continue;
+				
+				string argFormatted;
+				
+				if (isValidType(args[i], DT_VECTOR)) {
+					Vector vec = parseVector(args[i]);
+					
+					if (vec.y == 0 && vec.z == 0) {
+						argFormatted = args[i];
+					} else {
+						argFormatted = fmt(vec);
+					}
+				} else if (isValidType(args[i], DT_MATRIX)) {
+					argFormatted = fmt(*parseMatrix(args[i]));
+				} else {
+					argFormatted = args[i];
+				}
+				
+				newArr.emplace_back(argFormatted);
+			}
+			
+			result = fmt(newArr);
+			break;
+		}
+		case S_ARRAY_DELETE: {
+			StringArray arr = parseArray(args[0]);
+			StringArray newArr;
+			
+			if (args.size() == 2) {
+				long element = strtol(args[1].c_str(), nullptr, 10);
+				if (element < 0) {
+					result = fmt(newArr);
+					break;
+				}
+				
+				if (element >= arr.size()) {
+					cout << "SCRIPT ERROR: array deletion index out of bounds" << endl;
+					script.invalidate();
+					break;
+				}
+				
+				newArr = arr;
+				newArr.erase(newArr.begin() + element);
+			} else {
+				long a = strtol(args[1].c_str(), nullptr, 10);
+				long b = strtol(args[1].c_str(), nullptr, 10);
+				
+				if (a < 0 && b < 0) {
+					result = fmt(newArr);
+					break;
+				}
+				
+				if (b >= arr.size()) {
+					cout << "SCRIPT ERROR: maximum array deletion index out of bounds" << endl;
+					script.invalidate();
+					break;
+				}
+				
+				newArr = arr;
+				newArr.erase(newArr.begin() + a, newArr.begin() + b);
+			}
+			
+			result = fmt(newArr);
+			break;
+		}
 		case S_NOP: {
 			result = args[0];
 			break;
@@ -1141,6 +1553,16 @@ void ScriptEngine::executeVoidOperation(ScriptOperation operation) {
 			ignore = true;
 			script.jump(loopEndStack.front());
 			loopEndStack.pop_front();
+			break;
+		}
+		case S_CONTINUE: {
+			if (loopEndStack.empty()) {
+				cout << "SCRIPT ERROR: Floating CONTINUE statement." << endl;
+				script.invalidate();
+				break;
+			}
+			
+			cont = true;
 			break;
 		}
 		case S_ENDFOR: {
@@ -1246,6 +1668,7 @@ long ScriptEngine::eval() {
 		Command command = script.nextCommand();
 		
 		ignore = false;
+		cont = false;
 		executeScriptCommand(command);
 	}
 	

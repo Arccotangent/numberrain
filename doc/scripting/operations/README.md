@@ -47,6 +47,23 @@ The following is a list of operations supported by the scripting engine.
 - `VPTR` (Vector conversion - polar to rectangular)
 - `VRTP` (Vector conversion - rectangular to polar)
 
+### Matrices
+
+- `MIDENT` (Identity matrix generator) (scripting exclusive)
+- `MADD` (Matrix addition)
+- `MSUB` (Matrix subtraction)
+- `MMUL` (Matrix multiplication)
+- `MDET` (Matrix determinant)
+
+### Arrays (scripting exclusive)
+
+- `AC` (Construct array)
+- `ADELETE` (Delete elements from array)
+- `AE` (Extract element from array)
+- `ALEN` (Retrieve length of array)
+- `APOST` (Append to array)
+- `APRE` (Prepend to array)
+
 ### Utilities (scripting exclusive)
 
 - `NOP` (Store a value in the result register)
@@ -55,6 +72,10 @@ The following is a list of operations supported by the scripting engine.
 - `VX` (Extract vector's x value)
 - `VY` (Extract vector's y value)
 - `VZ` (Extract vector's z value)
+- `MC` (Construct matrix - useful for variables)
+- `ME` (Extract element from matrix)
+- `MX` (Retrieve amount of columns in matrix)
+- `MY` (Retrieve amount of rows in matrix)
 - `FLOOR` (Round a real number down)
 - `CEIL` (Round a real number up)
 - `ROUND` (Round a real number up or down using the 5/4 rule)
@@ -64,6 +85,9 @@ The following is a list of operations supported by the scripting engine.
 
 - `BEGIN` and `END` (Begin and end a script)
 - `FOR` and `ENDFOR` (For loops)
+- `WHILE` and `ENDWHILE` (While loops)
+- `BREAK` (Breaking out of a loop)
+- `CONTINUE` (Skip to the next iteration of a loop)
 - `DISABLEWORK` (Disable showing work)
 - `ENABLEWORK` (Enable showing work)
 - `IF`, `ELSEIF`, `ELSE`, `ENDIF` (Conditional execution)

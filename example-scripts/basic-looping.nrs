@@ -2,6 +2,7 @@
 # first loop adds the first 5 positive integers (1 + 2 + 3 + 4 + 5) - should yield 15
 # second loop adds the first 5 perfect squares - should yield 55
 # third loop breaks out 'prematurely' after summing the first 5 perfect cubes - should yield 100
+# fourth loop adds all positive even integers up to 20 - should yield 110
 
 !PRECISION 100
 
@@ -11,6 +12,7 @@ BEGIN;
 NOP 0;
 ASSIGN sum;
 
+# simple for loop
 FOR i 1 6 1;
 	ADD sum i;
 	ASSIGN sum;
@@ -24,6 +26,7 @@ ASSIGN sum2;
 NOP 5;
 ASSIGN num;
 
+# simple while loop
 WHILE num > 0;
 	EXP num 2;
 	ADD sum2 result;
@@ -61,5 +64,31 @@ WHILE 1 == 1;
 ENDWHILE;
 
 PRINT "perfect cube sum is " sum3;
+
+NOP 0;
+ASSIGN sum4;
+
+NOP 0;
+ASSIGN num;
+
+# demonstration of CONTINUE statement to skip over the rest of a loop iteration
+WHILE 1 == 1;
+	MUTE;
+	ADD num 1;
+	ASSIGN num;
+
+	MOD num 2;
+	IF result != 0;
+		CONTINUE;
+	ENDIF;
+	UNMUTE;
+
+	ADD sum4 num;
+	ASSIGN sum4;
+
+	IF num >= 20;
+		BREAK;
+	ENDIF;
+ENDWHILE;
 
 END;
